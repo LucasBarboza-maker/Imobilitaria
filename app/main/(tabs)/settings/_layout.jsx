@@ -6,13 +6,9 @@ function HomeScreen() {
   const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Settings Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate('login')}
-      />
-    </View>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Settings</Text>
+      </View>
   );
 }
 

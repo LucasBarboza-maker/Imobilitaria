@@ -21,6 +21,12 @@ function RootLayout() {
           name="register"
           options={{ title: 'Register Screen', headerShown: false }} />
         <Stack.Screen
+          name="house-details"
+          options={{ title: 'House Details Screen', headerShown: false }} />
+        <Stack.Screen
+          name="create-house"
+          options={{ title: 'Create House Screen', headerShown: false }} />
+        <Stack.Screen
           name="main/(tabs)"
           options={{ title: 'Main Screen', headerShown: false }} />
       </Stack>
