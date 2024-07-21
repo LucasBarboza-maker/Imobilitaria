@@ -2,18 +2,18 @@ import * as React from 'react';
 import { View, Text, Button } from 'react-native';
 import { useNavigation } from 'expo-router';
 
-function LoginScreen({  }) {
+function HomeScreen() {
   const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Login Screen</Text>
+      <Text>Settings Screen</Text>
       <Button
         title="Go to Details"
-        onPress={() => navigation.navigate('home/index')}
+        onPress={() => navigation.navigate('login')}
       />
     </View>
   );
 }
 
-export default LoginScreen;
+export default HomeScreen;
