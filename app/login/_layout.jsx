@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import CustomCheckbox from '../../components/CustomCheckbox'; // Supondo que o CustomCheckbox esteja no mesmo diretório
+import CustomCheckbox from '../../components/CustomCheckbox';
+import storageService from '../../service/storageService'; // Ensure the correct path to storageService
 
-function LoginScreen({ }) {
+function LoginScreen() {
   const navigation = useNavigation();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -19,6 +20,20 @@ function LoginScreen({ }) {
     },
   };
 
+  const handleLogin = async () => {
+    try {
+      const user = await storageService.get(`user_${username}`);
+      if (user && user.password === password) {
+        Alert.alert('Sucesso', 'Login realizado com sucesso');
+        navigation.navigate('main/(tabs)');
+      } else {
+        Alert.alert('Erro', 'Credenciais inválidas');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Erro ao realizar login');
+    }
+  };
 
   return (
     <ImageBackground
@@ -27,7 +42,7 @@ function LoginScreen({ }) {
     >
       <View style={styles.container}>
         <Image
-          source={require('../../assets/images/logo.png')} // Substitua pelo caminho da sua imagem de logo
+          source={require('../../assets/images/logo.png')}
           style={styles.logo}
         />
         <Text style={styles.text}>Imobiliária</Text>
@@ -61,7 +76,7 @@ function LoginScreen({ }) {
         </View>
         <Button
           mode="contained"
-          onPress={() => navigation.navigate('main/(tabs)')}
+          onPress={handleLogin}
           style={styles.button}
         >
           Entrar
@@ -133,7 +148,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 8,
     backgroundColor: '#4A90E2',
-    fontSize:40
+    fontSize: 40,
   },
   forgotPassword: {
     color: '#FFFFFF',

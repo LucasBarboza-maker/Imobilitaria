@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
-import { TextInput, Button, ProgressBar, MD3Colors } from 'react-native-paper';
+import { TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import storageService from '../../service/storageService';
 
-function RegisterScreen({ }) {
+function RegisterScreen() {
   const navigation = useNavigation();
   const [name, setName] = React.useState('');
   const [surname, setSurname] = React.useState('');
@@ -30,12 +31,10 @@ function RegisterScreen({ }) {
     if (/[0-9]/.test(password)) strength += 25;
     if (/[^A-Za-z0-9]/.test(password)) strength += 25;
     
-    if(strength == 0) setStrengthLegend("Fraca: utilize letras maisuculas e caracteres especiais");
-    if(strength == 25) setStrengthLegend("Fraca: utilize letras maisuculas e caracteres especiais");
-    if(strength == 50) setStrengthLegend("Media: utilize letras maisuculas e caracteres especiais");
-    if(strength == 100) setStrengthLegend("Forte");
-
-    console.log(strength);
+    if(strength === 0) setStrengthLegend("Fraca: utilize letras maiúsculas e caracteres especiais");
+    if(strength === 25) setStrengthLegend("Fraca: utilize letras maiúsculas e caracteres especiais");
+    if(strength === 50) setStrengthLegend("Média: utilize letras maiúsculas e caracteres especiais");
+    if(strength === 100) setStrengthLegend("Forte");
 
     return strength;
   };
@@ -43,6 +42,30 @@ function RegisterScreen({ }) {
   const handlePasswordChange = (password) => {
     setPassword(password);
     setPasswordStrength(calculatePasswordStrength(password));
+  };
+
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem');
+      return;
+    }
+
+    const user = {
+      name,
+      surname,
+      email,
+      phone,
+      password,
+    };
+
+    try {
+      await storageService.save(`user_${email}`, user);
+      Alert.alert('Sucesso', 'Usuário registrado com sucesso');
+      navigation.navigate('main/(tabs)');
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Erro ao registrar usuário');
+    }
   };
 
   return (
@@ -101,7 +124,7 @@ function RegisterScreen({ }) {
           {passwordStrength >= 25 ? <View style={{ width: '23%', height: 8, backgroundColor: 'red' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
           {passwordStrength >= 50 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
           {passwordStrength >= 75 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-          {passwordStrength == 100 ? <View style={{ width: '23%', height: 8, backgroundColor: 'green' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
+          {passwordStrength === 100 ? <View style={{ width: '23%', height: 8, backgroundColor: 'green' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
         </View>
         <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', justifyContent: 'space-between', height: 16, marginBottom: 16 }}>
           <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16, width: '100%' }}>
@@ -118,7 +141,7 @@ function RegisterScreen({ }) {
         />
         <Button
           mode="contained"
-          onPress={() => navigation.navigate('main/(tabs)')}
+          onPress={handleRegister}
           style={styles.button}
         >
           Registrar
@@ -171,12 +194,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: '30%',
     transform: [{ translateY: -12 }]
-  },
-  progressBar: {
-    width: '100%',
-    height: 8,
-    borderRadius: 4,
-    marginBottom: 16,
   },
   button: {
     width: '100%',
