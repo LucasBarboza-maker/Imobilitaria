@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal } from 'react-native-paper';
 import FavoriteCard from '../../../../components/FavoriteCard';
+import storageService from '../../../../service/storageService'; // Ensure the correct path to storageService
 
 // Create a custom theme
 const theme = {
@@ -17,30 +18,25 @@ const theme = {
 
 function FavoritesScreen() {
   const navigation = useNavigation();
-  const [announcements, setAnnouncements] = React.useState([
-    {
-      id:"asokdfnasofgasofn",
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      id:"aspfgokmasgokisang",
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    }
-  ]);
-
+  const [announcements, setAnnouncements] = React.useState([]);
   const [visible, setVisible] = React.useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = React.useState(null);
 
+  React.useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const storedHouses = await storageService.get('houses') || [];
+        const favoriteHouses = storedHouses.filter(house => house.favorite === true);
+        setAnnouncements(favoriteHouses);
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
   const showModal = (announcement) => {
-    console.log("teste");
     setSelectedAnnouncement(announcement);
     setVisible(true);
   };
@@ -48,7 +44,8 @@ function FavoritesScreen() {
   const hideModal = () => setVisible(false);
 
   const removeAnnouncement = () => {
-    setAnnouncements(announcements.filter(a => a !== selectedAnnouncement));
+    const updatedAnnouncements = announcements.filter(a => a !== selectedAnnouncement);
+    setAnnouncements(updatedAnnouncements);
     hideModal();
   };
 
@@ -64,18 +61,18 @@ function FavoritesScreen() {
         </View>
         <ScrollView style={styles.scrollView} contentContainerStyle={announcements.length === 0 ? styles.emptyScrollView : null}>
           {announcements.length === 0 ? (
-            <Text style={styles.emptyText}>Sem anúncios registrados</Text>
+            <Text style={styles.emptyText}>Sem anúncios favoritos</Text>
           ) : (
             <View style={styles.cardsContainer}>
               {announcements.map((announcement, index) => (
                 <FavoriteCard
                   key={index}
                   id={announcement.id}
-                  title={announcement.title}
+                  title={announcement.city}
                   value={announcement.value}
                   description={announcement.description}
-                  icon={announcement.icon}
-                  imageSource={announcement.imageSource}
+                  icon="home" // assuming 'home' as a generic icon
+                  imageSource={announcement.images.length > 0 ? { uri: announcement.images[0] } : require('../../../../assets/images/home_bg_image.png')}
                   onPress={() => showModal(announcement)}
                 />
               ))}

@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, FlatList, Image, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput } from 'react-native-paper';
+import { Button, DefaultTheme, Provider as PaperProvider, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Dropdown } from 'react-native-paper-dropdown';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons for the delete icon
+import storageService from '../../service/storageService'; // Ensure the correct path to storageService
 
 // Create a custom theme
 const theme = {
@@ -35,15 +37,17 @@ function CreateHouseScreen() {
     });
 
     if (!result.cancelled) {
-      const newImages = [...images, ...result.selected.map((image) => image.uri)];
+      const newImages = [...images, result.uri];
       setImages(newImages);
-      localStorage.setItem('uploadedImages', JSON.stringify(newImages));
+      await storageService.save('uploadedImages', newImages);
     }
   };
 
   const addCollege = () => {
-    setNearbyColleges([...nearbyColleges, newCollege]);
-    setNewCollege('');
+    if (newCollege) {
+      setNearbyColleges([...nearbyColleges, newCollege]);
+      setNewCollege('');
+    }
   };
 
   const removeCollege = (index) => {
@@ -51,9 +55,8 @@ function CreateHouseScreen() {
     setNearbyColleges(updatedColleges);
   };
 
-  const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log({
+  const handleSubmit = async () => {
+    const houseData = {
       propertyType,
       value,
       images,
@@ -61,7 +64,18 @@ function CreateHouseScreen() {
       neighborhood,
       description,
       nearbyColleges,
-    });
+    };
+
+    try {
+      const existingData = await storageService.get('houses') || [];
+      const updatedData = [...existingData, houseData];
+      await storageService.save('houses', updatedData);
+      Alert.alert('Sucesso', 'Imóvel adicionado com sucesso');
+      navigation.goBack();
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', 'Erro ao adicionar imóvel');
+    }
   };
 
   return (

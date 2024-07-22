@@ -4,6 +4,7 @@ import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import AnnouncementCard from '../../../../components/AnnouncementCard';
+import storageService from '../../../../service/storageService' // Ensure the correct path to storageService
 
 // Create a custom theme
 const theme = {
@@ -17,40 +18,20 @@ const theme = {
 
 function AnnouncementsScreen() {
   const navigation = useNavigation();
-  const [announcements, setAnnouncements] = React.useState([
-    // Example announcements, this should be fetched from an API or database
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "1000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    }
-  ]);
+  const [announcements, setAnnouncements] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const storedHouses = await storageService.get('houses') || [];
+        setAnnouncements(storedHouses);
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
 
   return (
     <PaperProvider theme={theme}>
@@ -59,7 +40,7 @@ function AnnouncementsScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.section}>
             <Text style={styles.text}>Anúncios</Text>
-            <Button mode="contained" onPress={() => {navigation.navigate('create-house')}}>
+            <Button mode="contained" onPress={() => navigation.navigate('create-house')}>
               Criar
             </Button>
           </View>
@@ -73,11 +54,11 @@ function AnnouncementsScreen() {
               {announcements.map((announcement, index) => (
                 <AnnouncementCard
                   key={index}
-                  title={announcement.title}
+                  title={announcement.city}
                   value={announcement.value}
                   description={announcement.description}
-                  icon={announcement.icon}
-                  imageSource={announcement.imageSource}
+                  icon="home" // assuming 'home' as a generic icon
+                  imageSource={announcement.images.length > 0 ? { uri: announcement.images[0] } : require('../../../../assets/images/home_bg_image.png')}
                 />
               ))}
             </View>
