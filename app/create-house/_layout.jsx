@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, Image, Alert, Dimensions, ScrollView } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput } from 'react-native-paper';
+import { Button, DefaultTheme, Provider as PaperProvider, Menu, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
-import { Dropdown } from 'react-native-paper-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
+import PagerView from 'react-native-pager-view'; // Import PagerView
 
 // Create a custom theme
 const theme = {
@@ -17,52 +19,117 @@ const theme = {
   },
 };
 
+const { width: viewportWidth } = Dimensions.get('window');
+
 function CreateHouseScreen() {
   const navigation = useNavigation();
   const [propertyType, setPropertyType] = React.useState('');
-  const [value, setValue] = React.useState('');
-  const [images, setImages] = React.useState([]);
+  const [price, setPrice] = React.useState('');
   const [city, setCity] = React.useState('');
   const [neighborhood, setNeighborhood] = React.useState('');
+  const [nearbyCollege, setNearbyCollege] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [nearbyColleges, setNearbyColleges] = React.useState([]);
-  const [newCollege, setNewCollege] = React.useState('');
+  const [images, setImages] = React.useState([]);
+  const [properties, setProperties] = React.useState([]);
+  const [menuVisible, setMenuVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const loadImages = async () => {
+      const savedImages = await AsyncStorage.getItem('uploadedImages');
+      if (savedImages) {
+        setImages(JSON.parse(savedImages));
+      }
+    };
+    loadImages();
+  }, []);
 
   const handleImageUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
+      allowsMultipleSelection: false,
     });
 
-    if (!result.cancelled) {
-      const newImages = [...images, ...result.selected.map((image) => image.uri)];
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      const base64 = await convertToBase64(uri);
+      const newImages = [...images, base64];
       setImages(newImages);
-      localStorage.setItem('uploadedImages', JSON.stringify(newImages));
+      await AsyncStorage.setItem('uploadedImages', JSON.stringify(newImages));
     }
   };
 
-  const addCollege = () => {
-    setNearbyColleges([...nearbyColleges, newCollege]);
-    setNewCollege('');
+  const convertToBase64 = (uri) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          resolve(reader.result);
+        };
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.onerror = reject;
+      xhr.open('GET', uri);
+      xhr.responseType = 'blob';
+      xhr.send();
+    });
   };
 
-  const removeCollege = (index) => {
-    const updatedColleges = nearbyColleges.filter((_, i) => i !== index);
-    setNearbyColleges(updatedColleges);
+  const deleteImage = (index) => {
+    Alert.alert(
+      "Delete Image",
+      "Are you sure you want to delete this image?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete", 
+          onPress: async () => {
+            const updatedImages = images.filter((_, i) => i !== index);
+            setImages(updatedImages);
+            await AsyncStorage.setItem('uploadedImages', JSON.stringify(updatedImages));
+          }
+        }
+      ],
+      { cancelable: true }
+    );
   };
 
   const handleSubmit = () => {
-    // Handle form submission logic here
-    console.log({
+    const newProperty = {
       propertyType,
-      value,
-      images,
+      price,
       city,
       neighborhood,
+      nearbyCollege,
       description,
-      nearbyColleges,
-    });
+      images,
+    };
+
+    setProperties([...properties, newProperty]);
+
+    // Clear the input fields
+    setPropertyType('');
+    setPrice('');
+    setCity('');
+    setNeighborhood('');
+    setNearbyCollege('');
+    setDescription('');
+    setImages([]);
+
+    Alert.alert("Success", "Property added successfully");
   };
+
+  const renderItem = (item, index) => (
+    <View style={styles.imageContainer} key={index}>
+      <Image source={{ uri: item }} style={styles.image} resizeMode="contain" />
+      <Button mode="text" onPress={() => deleteImage(index)} style={styles.deleteButton}>
+        <Icon name="delete" size={20} color="red" />
+      </Button>
+    </View>
+  );
 
   return (
     <PaperProvider theme={theme}>
@@ -70,83 +137,76 @@ function CreateHouseScreen() {
         <ExpoStatusBar style="auto" />
         <Text style={styles.title}>Adicionar Imóvel</Text>
 
+        {images.length > 0 && (
+          <PagerView style={styles.pagerView} initialPage={0}>
+            {images.map((item, index) => renderItem(item, index))}
+          </PagerView>
+        )}
+
         <Button mode="contained" onPress={handleImageUpload} style={styles.button}>
           Upload de Imagens
         </Button>
-        <FlatList
-          data={images}
-          renderItem={({ item }) => (
-            <Image source={{ uri: item }} style={styles.image} />
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          horizontal
-        />
-        <Dropdown
-          label="Tipo de Imóvel"
-          value={propertyType}
-          onSelect={(value) => setPropertyType(value)}
-          options={[
-            { label: 'Casa', value: 'Casa' },
-            { label: 'Kitnet', value: 'Kitnet' },
-            { label: 'Apartamento', value: 'Apartamento' },
-            { label: 'Imóvel Compartilhado', value: 'Imóvel Compartilhado' },
-          ]}
-          style={styles.input}
-        />
-        <TextInput
-          label="Valor do Imóvel"
-          placeholder='Valor do Imóvel'
-          value={value}
-          onChangeText={(text) => setValue(text)}
-          keyboardType="numeric"
-          style={styles.input}
-        />
-        <TextInput
-          label="Cidade"
-          value={city}
-          onChangeText={(text) => setCity(text)}
-          style={styles.input}
-        />
-        <View style={styles.collegeContainer}>
+
+        <ScrollView>
+          <View>
+            <Menu
+              visible={menuVisible}
+              onDismiss={() => setMenuVisible(false)}
+              anchor={
+                <Button onPress={() => setMenuVisible(true)}>
+                  Tipo de Imóvel
+                </Button>
+              }
+            >
+              <Menu.Item onPress={() => { setPropertyType('Casa'); setMenuVisible(false); }} title="Casa" />
+              <Menu.Item onPress={() => { setPropertyType('Kitnet'); setMenuVisible(false); }} title="Kitnet" />
+              <Menu.Item onPress={() => { setPropertyType('Apartamento'); setMenuVisible(false); }} title="Apartamento" />
+              <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setMenuVisible(false); }} title="Imóvel Compartilhado" />
+            </Menu>
+            <Text>{propertyType}</Text>
+          </View>
+
           <TextInput
-            label="Faculdades Próximas"
-            value={newCollege}
-            onChangeText={(text) => setNewCollege(text)}
-            style={styles.collegeInput}
+            label="Valor do Imóvel"
+            value={price}
+            onChangeText={text => setPrice(text)}
+            style={styles.input}
+            keyboardType="numeric"
           />
-          <Button mode="contained" onPress={addCollege} style={styles.addButton}>
-            Adicionar
+
+          <TextInput
+            label="Cidade"
+            value={city}
+            onChangeText={text => setCity(text)}
+            style={styles.input}
+          />
+
+          <TextInput
+            label="Bairro"
+            value={neighborhood}
+            onChangeText={text => setNeighborhood(text)}
+            style={styles.input}
+          />
+
+          <TextInput
+            label="Faculdade Próxima"
+            value={nearbyCollege}
+            onChangeText={text => setNearbyCollege(text)}
+            style={styles.input}
+          />
+
+          <TextInput
+            label="Descrição"
+            value={description}
+            onChangeText={text => setDescription(text)}
+            style={[styles.input, styles.descriptionInput]}
+            multiline
+          />
+
+          <Button mode="contained" onPress={handleSubmit} style={styles.button}>
+            Adicionar Imóvel
           </Button>
-        </View>
-        <FlatList
-          data={nearbyColleges}
-          renderItem={({ item, index }) => (
-            <View style={styles.collegeItem}>
-              <Text>{item}</Text>
-              <TouchableOpacity onPress={() => removeCollege(index)}>
-                <MaterialIcons name="delete" size={24} color="red" />
-              </TouchableOpacity>
-            </View>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-        />
-        <TextInput
-          label="Bairro"
-          value={neighborhood}
-          onChangeText={(text) => setNeighborhood(text)}
-          style={styles.input}
-        />
-        <TextInput
-          label="Descrição"
-          value={description}
-          onChangeText={(text) => setDescription(text)}
-          multiline
-          numberOfLines={4}
-          style={[styles.input, styles.descriptionInput]}
-        />
-        <Button mode="contained" onPress={handleSubmit} style={styles.button}>
-          Adicionar Imóvel
-        </Button>
+        </ScrollView>
       </SafeAreaView>
     </PaperProvider>
   );
@@ -176,10 +236,25 @@ const styles = StyleSheet.create({
   button: {
     marginVertical: 16,
   },
+  pagerView: {
+    width: viewportWidth,
+    height: viewportWidth,
+    marginBottom: 16,
+  },
+  imageContainer: {
+    position: 'relative', // Add relative positioning
+    width: '100%',
+    height: '100%',
+  },
   image: {
-    width: 100,
-    height: 100,
-    marginRight: 8,
+    width: '100%',
+    height: '100%',
+  },
+  deleteButton: {
+    position: 'absolute', // Add absolute positioning
+    top: 0,
+    right: 0,
+    backgroundColor: 'transparent', // Make the button background transparent
   },
   collegeContainer: {
     flexDirection: 'row',
