@@ -28,7 +28,7 @@ function AnnouncementsScreen() {
   const [nearbyCollege, setNearbyCollege] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [menuVisible, setMenuVisible] = React.useState(false);
-  const [sliderValue, setSliderValue] = React.useState(50000);  // State for slider value
+  const [sliderValue, setSliderValue] = React.useState(50000); 
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
