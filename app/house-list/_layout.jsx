@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, ScrollView, TouchableOpacity, Keyboard } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, Keyboard } from 'react-native';
 import { useNavigation } from 'expo-router';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import HomeCard from '../../../../components/HomeCard';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput, Menu, Divider } from 'react-native-paper';
+import AnnouncementCard from '../../components/AnnouncementCard';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';  // Import Slider
 
+// Create a custom theme
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -15,19 +17,18 @@ const theme = {
   },
 };
 
-function HomeScreen() {
+function AnnouncementsScreen() {
   const navigation = useNavigation();
   const [search, setSearch] = React.useState('');
   const [filterVisible, setFilterVisible] = React.useState(false);
-  const [menuVisible, setMenuVisible] = React.useState(false);
-  const [sliderValue, setSliderValue] = React.useState(50000);
   const [propertyType, setPropertyType] = React.useState('');
   const [price, setPrice] = React.useState('');
   const [city, setCity] = React.useState('');
   const [neighborhood, setNeighborhood] = React.useState('');
   const [nearbyCollege, setNearbyCollege] = React.useState('');
   const [description, setDescription] = React.useState('');
-
+  const [menuVisible, setMenuVisible] = React.useState(false);
+  const [sliderValue, setSliderValue] = React.useState(50000);  // State for slider value
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
@@ -47,87 +48,83 @@ function HomeScreen() {
     // Apply filter logic here using filterCriteria object
   };
 
+  const [announcements, setAnnouncements] = React.useState([
+    // Example announcements, this should be fetched from an API or database
+    {
+      title: "Ilha do Governador - RJ",
+      value: "10000",
+      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
+      icon: "home",
+      imageSource: require('../../assets/images/home_bg_image.png'),
+    },
+    {
+      title: "Ilha do Governador - RJ",
+      value: "10000",
+      icon: "home",
+      imageSource: require('../../assets/images/home_bg_image.png'),
+    },
+    {
+      title: "Ilha do Governador - RJ",
+      value: "10000",
+      icon: "home",
+      imageSource: require('../../assets/images/home_bg_image.png'),
+    },
+    {
+      title: "Ilha do Governador - RJ",
+      value: "10000",
+      icon: "home",
+      imageSource: require('../../assets/images/home_bg_image.png'),
+    },
+    {
+      title: "Ilha do Governador - RJ",
+      value: "1000",
+      icon: "home",
+      imageSource: require('../../assets/images/home_bg_image.png'),
+    }
+  ]);
 
   return (
     <PaperProvider theme={theme}>
-      <ScrollView style={styles.container}>
-        <View style={styles.imageContainer}>
-          <View style={styles.imageWrapper}>
-            <ImageBackground
-              source={require('../../../../assets/images/home_bg_image.png')}
-              style={styles.imageBackground}
-              imageStyle={{ borderBottomLeftRadius: 30, borderBottomRightRadius: 30 }}
-            >
-              <View style={styles.logoContainer}>
-                <Image
-                  source={require('../../../../assets/images/logo.png')}
-                  style={styles.logo}
+      <SafeAreaView style={styles.safeArea}>
+        <ExpoStatusBar style="auto" />
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackIcon}>
+            <Icon name="arrow-left" size={24} color="#1D3D4C" />
+          </TouchableOpacity>
+          <View style={styles.searchInputContainer}>
+            <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
+            <TextInput
+              placeholder="Pesquise por acomodações"
+              placeholderTextColor="#aaaaaa"
+              value={search}
+              onChangeText={text => setSearch(text)}
+              onSubmitEditing={handleSearchSubmit}
+              style={styles.searchInput}
+            />
+            <TouchableOpacity onPress={() => setFilterVisible(true)}>
+              <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.divider} />
+        </View>
+        <ScrollView style={styles.scrollView} contentContainerStyle={announcements.length === 0 ? styles.emptyScrollView : null}>
+          {announcements.length === 0 ? (
+            <Text style={styles.emptyText}>Sem anúncios registrados</Text>
+          ) : (
+            <View style={styles.cardsContainer}>
+              {announcements.map((announcement, index) => (
+                <AnnouncementCard
+                  key={index}
+                  title={announcement.title}
+                  value={announcement.value}
+                  description={announcement.description}
+                  icon={announcement.icon}
+                  imageSource={announcement.imageSource}
                 />
-                <Text style={{ color: 'white', fontSize: 26, fontWeight: 'bold', marginBottom: 16 }}>
-                  Imobiliária
-                </Text>
-                <View style={styles.searchInputContainer}>
-                  <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
-                  <TextInput
-                    placeholder="Pesquise por acomodações"
-                    placeholderTextColor="#aaaaaa"
-                    value={search}
-                    onChangeText={text => setSearch(text)}
-                    onSubmitEditing={handleSearchSubmit}
-                    style={styles.searchInput}
-                  />
-                  <TouchableOpacity onPress={() => setFilterVisible(true)}>
-                    <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={{ width: '70%', paddingHorizontal: 20, height: '25%', alignContent: 'flex-end', justifyContent: 'flex-end' }}>
-                <Text style={{ color: 'white', fontSize: 32 }}>
-                  Hospede-se pertinho da sua <Text style={{ fontWeight: 'bold' }}>Faculdade</Text>
-                </Text>
-              </View>
-            </ImageBackground>
-          </View>
-        </View>
-        <View style={styles.advertiseContainer}>
-          <View style={{ width: '70%' }}>
-            <Text style={{ color: 'black', fontSize: 26 }}>
-              <Text style={{ fontWeight: 'bold' }}>Anuncie</Text> seu imóvel e faça uma renda <Text style={{ fontWeight: 'bold' }}>extra!</Text>
-            </Text>
-          </View>
-          <View>
-            <Icon name="chevron-right" size={48} color="#00509E" style={styles.chevronIcon} />
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View>
-          <View style={styles.advertiseContainer}>
-            <Text style={{ color: 'black', fontSize: 20 }}>Últimas visualizações:</Text>
-          </View>
-          <ScrollView contentContainerStyle={styles.containerScroll} horizontal={true}>
-            <HomeCard
-              title="Title 1"
-              value="$100"
-              icon="home"
-              padding={10}
-              imageSource={require('../../../../assets/images/home_bg_image.png')}
-            />
-            <HomeCard
-              title="Title 2"
-              value="$200"
-              icon="star"
-              padding={10}
-              imageSource={require('../../../../assets/images/home_bg_image.png')}
-            />
-            <HomeCard
-              title="Title 3"
-              value="$300"
-              icon="heart"
-              padding={10}
-              imageSource={require('../../../../assets/images/home_bg_image.png')}
-            />
-          </ScrollView>
-        </View>
+              ))}
+            </View>
+          )}
+        </ScrollView>
         <Portal>
           <Modal visible={filterVisible} onDismiss={() => setFilterVisible(false)} contentContainerStyle={styles.modalContainer}>
             <ScrollView>
@@ -191,40 +188,12 @@ function HomeScreen() {
             </ScrollView>
           </Modal>
         </Portal>
-      </ScrollView>
+      </SafeAreaView>
     </PaperProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  containerScroll: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  imageContainer: {
-    height: 500,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  imageWrapper: {
-    width: '100%',
-    height: '100%',
-    overflow: 'hidden',
-  },
-  imageBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  gradient: {
-    ...StyleSheet.absoluteFillObject,
-    height: '100%',
-  },
   logoContainer: {
     alignItems: 'center',
     paddingBottom: 20,
@@ -235,59 +204,89 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   searchInputContainer: {
+    marginTop: 30,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     width: '80%',
   },
   searchInput: {
     flex: 1,
     height: 40,
-    borderColor: 'black',
-    borderWidth: 1,
-    borderTopEndRadius:20,
-    borderTopStartRadius:20,
+    borderTopEndRadius: 20,
+    borderTopLeftRadius: 20,
     borderRadius: 20,
-    paddingLeft: 40,
-    paddingRight: 40,
-    color: 'black',
+    paddingLeft: 20,
+    paddingRight: 20,
     backgroundColor: 'white',
   },
   filterIcon: {
     position: 'absolute',
     right: 10,
-    top: -10
+    top: -10,
+  },
+  goBackIcon: {
+    position: 'absolute',
+    left: 16,
+    top: 10,
+    zIndex: 10,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   searchIcon: {
     position: 'absolute',
     left: 10,
     zIndex: 10,
   },
-  advertiseContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 20,
-    padding: 10,
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  headerContainer: {
+    backgroundColor: '#fff',
+    display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  chevronIcon: {
-    marginLeft: 10,
+  scrollView: {
+    flex: 1,
   },
-  divider: {
-    width: '90%',
-    height: 1,
-    backgroundColor: '#6D6D6D',
-    marginTop: 10,
-    alignSelf: 'center',
-  },
-  contentContainer: {
+  emptyScrollView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
+  emptyText: {
+    fontSize: 18,
+    color: '#999',
+  },
+  cardsContainer: {
+    padding: 16,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  section: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 24,
+  },
+  text: {
+    flex: 1,
+    textAlign: 'left',
+    fontSize: 27,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginHorizontal: 16,
+    marginVertical: 8,
   },
   modalContainer: {
     backgroundColor: 'white',
@@ -304,6 +303,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: '#fff',
   },
+  descriptionInput: {
+    height: 100,
+  },
+  button: {
+    marginVertical: 16,
+  },
+  sliderContainer: {
+    marginVertical: 16,
+    alignItems: 'center',
+  },
 });
 
-export default HomeScreen;
+export default AnnouncementsScreen;

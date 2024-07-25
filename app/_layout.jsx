@@ -29,6 +29,9 @@ function RootLayout() {
         <Stack.Screen
           name="main/(tabs)"
           options={{ title: 'Main Screen', headerShown: false }} />
+        <Stack.Screen
+          name="house-list"
+          options={{ title: 'House List Screen', headerShown: false }} />
       </Stack>
     </>);
 }
