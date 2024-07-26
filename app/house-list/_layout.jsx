@@ -2,10 +2,11 @@ import * as React from 'react';
 import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, Keyboard } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput, Menu, Divider } from 'react-native-paper';
+import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput, Menu } from 'react-native-paper';
 import AnnouncementCard from '../../components/AnnouncementCard';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Slider from '@react-native-community/slider';  // Import Slider
+import Slider from '@react-native-community/slider';
+import localStorageService from '../../service/localStorageService';
 
 // Create a custom theme
 const theme = {
@@ -22,66 +23,49 @@ function AnnouncementsScreen() {
   const [search, setSearch] = React.useState('');
   const [filterVisible, setFilterVisible] = React.useState(false);
   const [propertyType, setPropertyType] = React.useState('');
-  const [price, setPrice] = React.useState('');
   const [city, setCity] = React.useState('');
   const [neighborhood, setNeighborhood] = React.useState('');
   const [nearbyCollege, setNearbyCollege] = React.useState('');
-  const [description, setDescription] = React.useState('');
   const [menuVisible, setMenuVisible] = React.useState(false);
-  const [sliderValue, setSliderValue] = React.useState(50000); 
+  const [sliderValue, setSliderValue] = React.useState(50000);
+  const [announcements, setAnnouncements] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchAnnouncements = async () => {
+      const houses = await localStorageService.getAllItems('houses');
+      setAnnouncements(houses);
+    };
+
+    fetchAnnouncements();
+  }, []);
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
-    navigation.navigate('house-list', { searchQuery: search });
+    applyFilters();
   };
 
   const applyFilters = () => {
     setFilterVisible(false);
     const filterCriteria = {
       propertyType,
-      price: sliderValue,
       city,
       neighborhood,
       nearbyCollege,
+      price: sliderValue,
     };
-    console.log(filterCriteria);
-    // Apply filter logic here using filterCriteria object
-  };
 
-  const [announcements, setAnnouncements] = React.useState([
-    // Example announcements, this should be fetched from an API or database
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
-      icon: "home",
-      imageSource: require('../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "1000",
-      icon: "home",
-      imageSource: require('../../assets/images/home_bg_image.png'),
-    }
-  ]);
+    const filteredAnnouncements = announcements.filter((announcement) => {
+      return (
+        (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
+        (!filterCriteria.city || announcement.city === filterCriteria.city) &&
+        (!filterCriteria.neighborhood || announcement.neighborhood === filterCriteria.neighborhood) &&
+        (!filterCriteria.nearbyCollege || announcement.nearbyCollege === filterCriteria.nearbyCollege) &&
+        (announcement.price <= filterCriteria.price)
+      );
+    });
+
+    setAnnouncements(filteredAnnouncements);
+  };
 
   return (
     <PaperProvider theme={theme}>
@@ -113,14 +97,18 @@ function AnnouncementsScreen() {
           ) : (
             <View style={styles.cardsContainer}>
               {announcements.map((announcement, index) => (
-                <AnnouncementCard
+                <TouchableOpacity
                   key={index}
-                  title={announcement.title}
-                  value={announcement.value}
-                  description={announcement.description}
-                  icon={announcement.icon}
-                  imageSource={announcement.imageSource}
-                />
+                  onPress={() => navigation.navigate('house-details', { houseId: announcement.id })}
+                >
+                  <AnnouncementCard
+                    title={announcement.city}
+                    value={announcement.price}
+                    description={announcement.description}
+                    icon="home"
+                    imageSource={{ uri: announcement.images[0] }}
+                  />
+                </TouchableOpacity>
               ))}
             </View>
           )}

@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal } from 'react-native-paper';
 import FavoriteCard from '../../../../components/FavoriteCard';
+import localStorageService from '../../../../service/localStorageService';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Create a custom theme
 const theme = {
@@ -17,38 +19,50 @@ const theme = {
 
 function FavoritesScreen() {
   const navigation = useNavigation();
-  const [announcements, setAnnouncements] = React.useState([
-    {
-      id:"asokdfnasofgasofn",
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      id:"aspfgokmasgokisang",
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    }
-  ]);
-
+  const [announcements, setAnnouncements] = React.useState([]);
   const [visible, setVisible] = React.useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = React.useState(null);
 
+  React.useEffect(() => {
+    const fetchFavorites = async () => {
+      const loggedUser = await localStorageService.getAllItems('logged');
+      if (loggedUser.length === 0) {
+        return;
+      }
+
+      const houses = await localStorageService.getAllItems('houses');
+      const userFavorites = houses.filter(house => 
+        house.favorites && house.favorites.some(user => user.id === loggedUser[0].id)
+      );
+      setAnnouncements(userFavorites);
+    };
+
+    fetchFavorites();
+  }, []);
+
   const showModal = (announcement) => {
-    console.log("teste");
     setSelectedAnnouncement(announcement);
     setVisible(true);
   };
 
   const hideModal = () => setVisible(false);
 
-  const removeAnnouncement = () => {
-    setAnnouncements(announcements.filter(a => a !== selectedAnnouncement));
+  const removeAnnouncement = async () => {
+    const updatedAnnouncements = announcements.filter(a => a.id !== selectedAnnouncement.id);
+    setAnnouncements(updatedAnnouncements);
+
+    const houses = await localStorageService.getAllItems('houses');
+    const updatedHouses = houses.map(h => {
+      if (h.id === selectedAnnouncement.id) {
+        return {
+          ...h,
+          favorites: h.favorites.filter(user => user.id !== loggedUser[0].id)
+        };
+      }
+      return h;
+    });
+    await localStorageService.setItem('houses', JSON.stringify(updatedHouses));
+
     hideModal();
   };
 
@@ -68,23 +82,26 @@ function FavoritesScreen() {
           ) : (
             <View style={styles.cardsContainer}>
               {announcements.map((announcement, index) => (
-                <FavoriteCard
+                <TouchableOpacity
                   key={index}
-                  id={announcement.id}
-                  title={announcement.title}
-                  value={announcement.value}
-                  description={announcement.description}
-                  icon={announcement.icon}
-                  imageSource={announcement.imageSource}
                   onPress={() => showModal(announcement)}
-                />
+                >
+                  <FavoriteCard
+                    id={announcement.id}
+                    title={announcement.city}
+                    value={announcement.price}
+                    description={announcement.description}
+                    icon="home"
+                    imageSource={{ uri: announcement.images[0] }}
+                  />
+                </TouchableOpacity>
               ))}
             </View>
           )}
         </ScrollView>
         <Portal>
           <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer}>
-            <Text>Deseja remover este anúncio?</Text>
+            <Text>Deseja remover este anúncio dos favoritos?</Text>
             <View style={styles.modalButtons}>
               <Button onPress={hideModal} mode="contained" style={styles.modalButton}>Não</Button>
               <Button onPress={removeAnnouncement} mode="contained" style={styles.modalButton}>Sim</Button>

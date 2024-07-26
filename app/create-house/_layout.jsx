@@ -5,8 +5,10 @@ import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Menu, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import the icon library
-import PagerView from 'react-native-pager-view'; // Import PagerView
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import PagerView from 'react-native-pager-view';
+import localStorageService from '../../service/localStorageService';
+import { v4 as uuidv4 } from 'uuid'; // Import UUID
 
 // Create a custom theme
 const theme = {
@@ -30,7 +32,6 @@ function CreateHouseScreen() {
   const [nearbyCollege, setNearbyCollege] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [images, setImages] = React.useState([]);
-  const [properties, setProperties] = React.useState([]);
   const [menuVisible, setMenuVisible] = React.useState(false);
 
   React.useEffect(() => {
@@ -97,29 +98,42 @@ function CreateHouseScreen() {
     );
   };
 
-  const handleSubmit = () => {
-    const newProperty = {
-      propertyType,
-      price,
-      city,
-      neighborhood,
-      nearbyCollege,
-      description,
-      images,
-    };
+  const handleSubmit = async () => {
+    try {
+      const loggedUser = await localStorageService.getAllItems('logged');
+      if (loggedUser.length === 0) {
+        Alert.alert('Erro', 'Nenhum usuário está logado');
+        return;
+      }
 
-    setProperties([...properties, newProperty]);
+      const newHouse = {
+        id: uuidv4(), // Generate UUID for the house
+        propertyType,
+        price,
+        city,
+        neighborhood,
+        nearbyCollege,
+        description,
+        images,
+        announcer: loggedUser[0],
+      };
 
-    // Clear the input fields
-    setPropertyType('');
-    setPrice('');
-    setCity('');
-    setNeighborhood('');
-    setNearbyCollege('');
-    setDescription('');
-    setImages([]);
+      await localStorageService.saveItem('houses', newHouse);
 
-    Alert.alert("Success", "Property added successfully");
+      // Clear the input fields
+      setPropertyType('');
+      setPrice('');
+      setCity('');
+      setNeighborhood('');
+      setNearbyCollege('');
+      setDescription('');
+      setImages([]);
+
+      Alert.alert("Sucesso", "Imóvel adicionado com sucesso");
+    } catch (error) {
+      console.error('Erro ao adicionar imóvel', error);
+      Alert.alert('Erro', 'Erro ao adicionar imóvel');
+    }
   };
 
   const renderItem = (item, index) => (
@@ -242,7 +256,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   imageContainer: {
-    position: 'relative', // Add relative positioning
+    position: 'relative',
     width: '100%',
     height: '100%',
   },
@@ -251,29 +265,10 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   deleteButton: {
-    position: 'absolute', // Add absolute positioning
+    position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: 'transparent', // Make the button background transparent
-  },
-  collegeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  collegeInput: {
-    flex: 1,
-    marginRight: 8,
-    backgroundColor: '#fff',
-  },
-  addButton: {
-    flexShrink: 0,
-  },
-  collegeItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    backgroundColor: 'transparent',
   },
   descriptionInput: {
     height: 100,

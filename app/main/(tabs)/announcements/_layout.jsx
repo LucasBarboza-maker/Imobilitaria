@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import AnnouncementCard from '../../../../components/AnnouncementCard';
+import localStorageService from '../../../../service/localStorageService';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Create a custom theme
 const theme = {
@@ -15,42 +17,24 @@ const theme = {
   },
 };
 
-function AnnouncementsScreen() {
+function UserAnnouncementsScreen() {
   const navigation = useNavigation();
-  const [announcements, setAnnouncements] = React.useState([
-    // Example announcements, this should be fetched from an API or database
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      description: "Casa bem localizada, situada em uma área repleta de comodidades e conveniências. A região é extremamente...",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "10000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    },
-    {
-      title: "Ilha do Governador - RJ",
-      value: "1000",
-      icon: "home",
-      imageSource: require('../../../../assets/images/home_bg_image.png'),
-    }
-  ]);
+  const [announcements, setAnnouncements] = React.useState([]);
+
+  React.useEffect(() => {
+    const fetchUserAnnouncements = async () => {
+      const loggedUser = await localStorageService.getAllItems('logged');
+      if (loggedUser.length === 0) {
+        return;
+      }
+
+      const houses = await localStorageService.getAllItems('houses');
+      const userAnnouncements = houses.filter(house => house.announcer.id === loggedUser[0].id);
+      setAnnouncements(userAnnouncements);
+    };
+
+    fetchUserAnnouncements();
+  }, []);
 
   return (
     <PaperProvider theme={theme}>
@@ -58,8 +42,8 @@ function AnnouncementsScreen() {
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
           <View style={styles.section}>
-            <Text style={styles.text}>Anúncios</Text>
-            <Button mode="contained" onPress={() => {navigation.navigate('create-house')}}>
+            <Text style={styles.text}>Meus Anúncios</Text>
+            <Button mode="contained" onPress={() => navigation.navigate('create-house')}>
               Criar
             </Button>
           </View>
@@ -71,14 +55,18 @@ function AnnouncementsScreen() {
           ) : (
             <View style={styles.cardsContainer}>
               {announcements.map((announcement, index) => (
-                <AnnouncementCard
+                <TouchableOpacity
                   key={index}
-                  title={announcement.title}
-                  value={announcement.value}
-                  description={announcement.description}
-                  icon={announcement.icon}
-                  imageSource={announcement.imageSource}
-                />
+                  onPress={() => navigation.navigate('house-details', { houseId: announcement.id })}
+                >
+                  <AnnouncementCard
+                    title={announcement.city}
+                    value={announcement.price}
+                    description={announcement.description}
+                    icon="home"
+                    imageSource={{ uri: announcement.images[0] }}
+                  />
+                </TouchableOpacity>
               ))}
             </View>
           )}
@@ -137,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AnnouncementsScreen;
+export default UserAnnouncementsScreen;

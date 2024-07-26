@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput, Alert } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { DefaultTheme, Provider as PaperProvider, Button, Modal, Portal } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import CommentCard from '../../components/CommentCard';
+import localStorageService from '../../service/localStorageService';
 
 // Create a custom theme
 const theme = {
@@ -16,20 +17,50 @@ const theme = {
   },
 };
 
-const commentsData = [
-  { name: 'John Doe', comment: 'Great place, really enjoyed my stay!', rating: 5 },
-  { name: 'Jane Smith', comment: 'Nice house, but a bit far from the beach.', rating: 4 },
-  { name: 'Sam Wilson', comment: 'Average experience, could be better.', rating: 3 },
-];
-
 function DetailScreen() {
+  const route = useRoute();
+  const { houseId } = route.params;
   const navigation = useNavigation();
-  const [comments, setComments] = React.useState(commentsData);
+  const [house, setHouse] = React.useState(null);
+  const [comments, setComments] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [newComment, setNewComment] = React.useState({ name: '', comment: '', rating: 0 });
 
-  const handleAddComment = () => {
-    setComments([...comments, newComment]);
+  React.useEffect(() => {
+    const fetchHouseDetails = async () => {
+      const houses = await localStorageService.getAllItems('houses');
+      const houseDetails = houses.find(house => house.id === houseId);
+      setHouse(houseDetails);
+      setComments(houseDetails?.comments || []);
+    };
+
+    fetchHouseDetails();
+  }, [houseId]);
+
+  const handleAddComment = async () => {
+    const loggedUser = await localStorageService.getAllItems('logged');
+    if (loggedUser.length === 0) {
+      Alert.alert('Erro', 'Nenhum usuário está logado');
+      return;
+    }
+
+    const newCommentWithUser = {
+      ...newComment,
+      name: loggedUser[0].name,
+    };
+
+    const updatedComments = [...comments, newCommentWithUser];
+    setComments(updatedComments);
+
+    const updatedHouse = {
+      ...house,
+      comments: updatedComments,
+    };
+
+    const houses = await localStorageService.getAllItems('houses');
+    const updatedHouses = houses.map(h => (h.id === houseId ? updatedHouse : h));
+    await localStorageService.setItem('houses', JSON.stringify(updatedHouses));
+
     setNewComment({ name: '', comment: '', rating: 0 });
     setModalVisible(false);
   };
@@ -46,6 +77,19 @@ function DetailScreen() {
     ));
   };
 
+  if (!house) {
+    return (
+      <PaperProvider theme={theme}>
+        <SafeAreaView style={styles.safeArea}>
+          <ExpoStatusBar style="auto" />
+          <View style={styles.loadingContainer}>
+            <Text>Loading...</Text>
+          </View>
+        </SafeAreaView>
+      </PaperProvider>
+    );
+  }
+
   return (
     <PaperProvider theme={theme}>
       <SafeAreaView style={styles.safeArea}>
@@ -57,15 +101,15 @@ function DetailScreen() {
           <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Voltar</Text>
         </View>
         <ImageBackground
-          source={require('../../assets/images/home_bg_image.png')}
+          source={{ uri: house.images[0] }}
           style={styles.imageBackground}
         >
           <View style={{ paddingLeft: 16 }}>
-            <Text style={styles.title}>Casa perto da praia</Text>
+            <Text style={styles.title}>{house.propertyType}</Text>
           </View>
           <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', padding: 16 }}>
             <View>
-              <Text style={styles.title}><Text>R$</Text>10000/<Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22, textAlign: 'right' }}>Mês</Text></Text>
+              <Text style={styles.title}><Text>R$</Text>{house.price}/<Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22, textAlign: 'right' }}>Mês</Text></Text>
             </View>
             <View style={styles.iconContainer}>
               <TouchableOpacity style={styles.iconButton}>
@@ -80,7 +124,7 @@ function DetailScreen() {
         <ScrollView style={styles.container}>
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Description:</Text>
-            <Text style={{ fontSize: 18, marginTop: 5 }}>Sem Descrição</Text>
+            <Text style={{ fontSize: 18, marginTop: 5 }}>{house.description}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.commentsContainer}>
@@ -105,12 +149,6 @@ function DetailScreen() {
             <Text style={styles.modalTitle}>Adicionar Comentário</Text>
             <TextInput
               style={styles.input}
-              placeholder="Nome"
-              value={newComment.name}
-              onChangeText={(text) => setNewComment({ ...newComment, name: text })}
-            />
-            <TextInput
-              style={styles.input}
               placeholder="Comentário"
               value={newComment.comment}
               onChangeText={(text) => setNewComment({ ...newComment, comment: text })}
@@ -133,6 +171,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',

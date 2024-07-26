@@ -3,9 +3,10 @@ import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from
 import { useNavigation } from 'expo-router';
 import { TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import CustomCheckbox from '../../components/CustomCheckbox'; // Supondo que o CustomCheckbox esteja no mesmo diretório
+import CustomCheckbox from '../../components/CustomCheckbox';
+import localStorageService from '../../service/localStorageService';
 
-function LoginScreen({ }) {
+function LoginScreen() {
   const navigation = useNavigation();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -19,6 +20,21 @@ function LoginScreen({ }) {
     },
   };
 
+  const handleLogin = async () => {
+    try {
+      const users = await localStorageService.getAllItems('users');
+      const user = users.find(user => user.email === username && user.password === password);
+
+      if (user) {
+        await localStorageService.saveItem('logged', user);
+        navigation.navigate('main/(tabs)');
+      } else {
+        alert('Email ou senha incorretos');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login', error);
+    }
+  };
 
   return (
     <ImageBackground
@@ -27,7 +43,7 @@ function LoginScreen({ }) {
     >
       <View style={styles.container}>
         <Image
-          source={require('../../assets/images/logo.png')} // Substitua pelo caminho da sua imagem de logo
+          source={require('../../assets/images/logo.png')}
           style={styles.logo}
         />
         <Text style={styles.text}>Imobiliária</Text>
@@ -55,13 +71,13 @@ function LoginScreen({ }) {
           <CustomCheckbox
             checked={stayConnected}
             onPress={() => setStayConnected(!stayConnected)}
-            borderColor="#4A90E2" 
+            borderColor="#4A90E2"
           />
           <Text style={styles.checkboxLabel}>Manter-me conectado</Text>
         </View>
         <Button
           mode="contained"
-          onPress={() => navigation.navigate('main/(tabs)')}
+          onPress={handleLogin}
           style={styles.button}
         >
           Entrar
@@ -133,7 +149,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 8,
     backgroundColor: '#4A90E2',
-    fontSize:40
+    fontSize: 40,
   },
   forgotPassword: {
     color: '#FFFFFF',
