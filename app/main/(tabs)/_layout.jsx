@@ -15,7 +15,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="announcements"
         options={{
-          title: 'Anúncios',
+          title: 'Meus Anúncios',
           headerShown: false,
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="flag" color={color} />,
         }}

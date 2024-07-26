@@ -58,7 +58,7 @@ function AnnouncementsScreen() {
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
           <View style={styles.section}>
-            <Text style={styles.text}>Anúncios</Text>
+            <Text style={styles.text}>Meus Anúncios</Text>
             <Button mode="contained" onPress={() => {navigation.navigate('create-house')}}>
               Criar
             </Button>
