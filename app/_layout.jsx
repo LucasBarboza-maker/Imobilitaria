@@ -10,9 +10,9 @@ function RootLayout() {
   return (
     <>
       <StatusBar barStyle="light-content" />
-      <Stack initialRouteName='login' >
+      <Stack initialRouteName='index' >
         <Stack.Screen
-          name="login"
+          name="index"
           options={{ title: 'Login Screen', headerShown: false }} />
         <Stack.Screen
           name="forgot-password"
