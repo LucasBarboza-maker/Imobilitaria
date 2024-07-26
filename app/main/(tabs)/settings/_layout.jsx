@@ -28,15 +28,15 @@ function Settings() {
         </View>
         <ScrollView style={styles.scrollView}>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('dados-pessoais')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('profile')}>
               <Icon name="account" size={20} color="#fff" style={styles.icon} />
               <Text style={styles.buttonText}>Dados Pessoais</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('alterar-senha')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('change-password-settings')}>
               <Icon name="lock" size={20} color="#fff" style={styles.icon} />
               <Text style={styles.buttonText}>Alterar Senha</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ajuda')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('help')}>
               <Icon name="help-circle" size={20} color="#fff" style={styles.icon} />
               <Text style={styles.buttonText}>Ajuda</Text>
             </TouchableOpacity>

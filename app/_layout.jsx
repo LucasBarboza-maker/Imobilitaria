@@ -32,6 +32,15 @@ function RootLayout() {
         <Stack.Screen
           name="house-list"
           options={{ title: 'House List Screen', headerShown: false }} />
+        <Stack.Screen
+          name="profile"
+          options={{ title: 'Profile Screen', headerShown: false }} />
+        <Stack.Screen
+          name="change-password-settings"
+          options={{ title: 'Change Password Settings Screen', headerShown: false }} />
+        <Stack.Screen
+          name="help"
+          options={{ title: 'Help Screen', headerShown: false }} />
       </Stack>
     </>);
 }
