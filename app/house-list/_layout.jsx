@@ -54,17 +54,20 @@ function AnnouncementsScreen() {
   const handleSearchSubmit = async (searchTerm, houses) => {
     Keyboard.dismiss();
     const searchValue = searchTerm || search;
-    if (searchValue.trim() === '') return;
 
     if (!houses) {
       houses = await localStorageService.getAllItems('houses');
     }
 
+    if (searchValue.trim() === '') {
+      setAnnouncements(houses);
+      return;
+    }
+
     const searchResults = houses.filter((announcement) =>
       String(announcement.city).toLowerCase().includes(searchValue.toLowerCase()) ||
       String(announcement.neighborhood).toLowerCase().includes(searchValue.toLowerCase()) ||
-      String(announcement.price).includes(searchValue) ||
-      String(announcement.nearbyCollege).includes(searchValue)
+      String(announcement.price).includes(searchValue)
     );
     setAnnouncements(searchResults);
   };

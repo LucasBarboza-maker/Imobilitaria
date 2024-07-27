@@ -30,6 +30,7 @@ function FavoritesScreen() {
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [sliderValue, setSliderValue] = React.useState(50000);
   const [announcements, setAnnouncements] = React.useState([]);
+  const [filteredAnnouncements, setFilteredAnnouncements] = React.useState([]);
   const [visible, setVisible] = React.useState(false);
   const [id, setId] = React.useState(null);
   const hideModal = () => setVisible(false);
@@ -43,6 +44,7 @@ function FavoritesScreen() {
     const houses = await localStorageService.getAllItems('houses');
     const favoriteHouses = houses.filter(house => house.favoriteUsers && house.favoriteUsers.some(fav => fav.email === user.email));
     setAnnouncements(favoriteHouses);
+    setFilteredAnnouncements(favoriteHouses);
   }
 
   React.useEffect(() => {
@@ -55,14 +57,16 @@ function FavoritesScreen() {
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
-    applyFilters();
+    const searchLowerCase = search.toLowerCase();
+    const filtered = announcements.filter(announcement => 
+      (announcement.city && announcement.city.toLowerCase().includes(searchLowerCase)) ||
+      (announcement.neighborhood && announcement.neighborhood.toLowerCase().includes(searchLowerCase)) ||
+      (announcement.price && announcement.price.toString().includes(search))
+    );
+    setFilteredAnnouncements(filtered);
   };
 
-  const applyFilters = async () => {
-    const user = JSON.parse(await AsyncStorage.getItem('logged'));
-    const houses = await localStorageService.getAllItems('houses');
-    const favoriteHouses = houses.filter(house => house.favoriteUsers && house.favoriteUsers.some(fav => fav.email === user.email));
-    
+  const applyFilters = () => {
     const filterCriteria = {
       propertyType,
       city,
@@ -71,17 +75,18 @@ function FavoritesScreen() {
       price: sliderValue,
     };
 
-    const filteredAnnouncements = favoriteHouses.filter((announcement) => {
+    const filtered = announcements.filter((announcement) => {
+      const isWithinPriceRange = Math.abs(announcement.price - filterCriteria.price) <= 1000;
       return (
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
-        (!filterCriteria.city || announcement.city === filterCriteria.city) &&
-        (!filterCriteria.neighborhood || announcement.neighborhood === filterCriteria.neighborhood) &&
-        (!filterCriteria.nearbyCollege || announcement.nearbyCollege === filterCriteria.nearbyCollege) &&
-        (announcement.price <= filterCriteria.price)
+        (!filterCriteria.city || announcement.city.toLowerCase() === filterCriteria.city.toLowerCase()) &&
+        (!filterCriteria.neighborhood || announcement.neighborhood.toLowerCase() === filterCriteria.neighborhood.toLowerCase()) &&
+        (!filterCriteria.nearbyCollege || announcement.nearbyCollege.toLowerCase() === filterCriteria.nearbyCollege.toLowerCase()) &&
+        isWithinPriceRange
       );
     });
 
-    setAnnouncements(filteredAnnouncements);
+    setFilteredAnnouncements(filtered);
     setFilterVisible(false);
   };
 
@@ -149,12 +154,12 @@ function FavoritesScreen() {
           </View>
           <View style={styles.divider} />
         </View>
-        <ScrollView style={styles.scrollView} contentContainerStyle={announcements.length === 0 ? styles.emptyScrollView : null}>
-          {announcements.length === 0 ? (
+        <ScrollView style={styles.scrollView} contentContainerStyle={filteredAnnouncements.length === 0 ? styles.emptyScrollView : null}>
+          {filteredAnnouncements.length === 0 ? (
             <Text style={styles.emptyText}>Sem anúncios registrados</Text>
           ) : (
             <View style={styles.cardsContainer}>
-              {announcements.map((announcement, index) => (
+              {filteredAnnouncements.map((announcement, index) => (
                 <FavoriteCard
                   key={index}
                   id={announcement.id}
