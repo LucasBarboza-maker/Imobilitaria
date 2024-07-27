@@ -5,7 +5,7 @@ import { DefaultTheme, Provider as PaperProvider, Button, Modal, Portal } from '
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import CommentCard from '../../components/CommentCard';
-import localStorageService from '../../service/localStorageService';
+import localStorageService from '../service/localStorageService';
 
 // Create a custom theme
 const theme = {

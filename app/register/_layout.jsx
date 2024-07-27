@@ -3,7 +3,7 @@ import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from
 import { useNavigation } from 'expo-router';
 import { TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import localStorageService from '../../service/localStorageService';
+import localStorageService from '../service/localStorageService';
 
 function RegisterScreen() {
   const navigation = useNavigation();

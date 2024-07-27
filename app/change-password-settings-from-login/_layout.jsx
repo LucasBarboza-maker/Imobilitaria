@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, ToastAndroid } from 'react-native';
-import { useNavigation } from 'expo-router';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, Alert, ToastAndroid } from 'react-native';
+import { useNavigation, useLocalSearchParams } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import localStorageService from '../service/localStorageService';
 
+// Create a custom theme
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -19,12 +19,14 @@ const theme = {
 function ChangePasswordScreen() {
   const navigation = useNavigation();
   const [currentPassword, setCurrentPassword] = React.useState('');
+  const params = useLocalSearchParams();
+  const { email } = params;
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmNewPassword, setConfirmNewPassword] = React.useState('');
   const [passwordsMatch, setPasswordsMatch] = React.useState(true);
-  const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
-  const [showConfirmNewPassword, setShowConfirmNewPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   React.useEffect(() => {
     setPasswordsMatch(newPassword === confirmNewPassword);
@@ -32,35 +34,30 @@ function ChangePasswordScreen() {
 
   const handleChangePassword = async () => {
     if (!passwordsMatch) {
-      ToastAndroid.show('A nova senha não combina', ToastAndroid.SHORT);
+      Alert.alert('Erro', 'As senhas não coincidem');
       return;
     }
 
-    const storedUser = JSON.parse(await AsyncStorage.getItem('logged'));
+    if(newPassword.length <= 8){
+      Alert.alert('Erro', 'A senha deve conter pelo menos 8 caracteres');
+      return;
+    }
     
-    if (storedUser) {
-      const users = await localStorageService.getAllItems('users');
-      const user = users.find(user => user.email === storedUser.email);
+    const users = await localStorageService.getAllItems('users');
+    const user = users.find(user => user.email === email);
 
-      if(user.password != currentPassword){
-        ToastAndroid.show('Senha antiga incorreta!!', ToastAndroid.SHORT);
-        return; 
-      }
-
-      user.password = newPassword;
-
-      console.log(user.password);
-      
-      localStorageService.updateUserItem('users', user.email, user);
-
-      ToastAndroid.show('Sucesso ao alterar a senha', ToastAndroid.SHORT);
-      setTimeout(() => {
-        navigation.navigate("index");
-      }, 3500); 
-
+    if(!user){
+      Alert.alert('Erro', 'Email não existente');
+      return;
     }
 
-    console.log({ currentPassword, newPassword, confirmNewPassword });
+    user.password = newPassword;
+    await localStorageService.updateUserItem("users", user.email, user);
+
+    ToastAndroid.show('Sucesso ao alterar a senha', ToastAndroid.LONG);
+    setTimeout(() => {
+      navigation.navigate("index");
+    }, 3500); // Wait for the toast to disappear before navigating
   };
 
   return (
@@ -79,28 +76,16 @@ function ChangePasswordScreen() {
         <View style={styles.inputContainer}>
           <View style={styles.passwordContainer}>
             <TextInput
-              label="Senha Atual"
-              value={currentPassword}
-              onChangeText={text => setCurrentPassword(text)}
-              style={styles.input}
-              mode="outlined"
-              secureTextEntry={!showCurrentPassword}
-            />
-            <TouchableOpacity onPress={() => setShowCurrentPassword(!showCurrentPassword)} style={styles.eyeIcon}>
-              <Icon name={showCurrentPassword ? "eye-off" : "eye"} size={24} color="#333" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.passwordContainer}>
-            <TextInput
               label="Nova Senha"
               value={newPassword}
               onChangeText={text => setNewPassword(text)}
               style={styles.input}
               mode="outlined"
               secureTextEntry={!showNewPassword}
+              right={<TextInput.Icon name={showNewPassword ? "eye-off" : "eye"} onPress={() => setShowNewPassword(!showNewPassword)} />}
             />
-            <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)} style={styles.eyeIcon}>
-              <Icon name={showNewPassword ? "eye-off" : "eye"} size={24} color="#333" />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
             </TouchableOpacity>
           </View>
           <View style={styles.passwordContainer}>
@@ -110,13 +95,15 @@ function ChangePasswordScreen() {
               onChangeText={text => setConfirmNewPassword(text)}
               style={[styles.input, !passwordsMatch && styles.errorInput]}
               mode="outlined"
-              secureTextEntry={!showConfirmNewPassword}
+              secureTextEntry={!showConfirmPassword}
+              right={<TextInput.Icon name={showConfirmPassword ? "eye-off" : "eye"} onPress={() => setShowConfirmPassword(!showConfirmPassword)} />}
               error={!passwordsMatch}
             />
-            <TouchableOpacity onPress={() => setShowConfirmNewPassword(!showConfirmNewPassword)} style={styles.eyeIcon}>
-              <Icon name={showConfirmNewPassword ? "eye-off" : "eye"} size={24} color="#333" />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
             </TouchableOpacity>
           </View>
+
           {!passwordsMatch && (
             <Text style={styles.errorText}>As senhas não são compatíveis</Text>
           )}
@@ -149,10 +136,22 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 16,
-    flex: 1,
+    width: '100%'
   },
   errorInput: {
     borderColor: 'red',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  eyeIcon: {
+    padding: 8,
+    position: 'absolute',
+    right: 0,
+    top: '30%',
+    transform: [{ translateY: -12 }]
   },
   errorText: {
     color: 'red',
@@ -174,15 +173,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   backButton: {
-    marginRight: 16,
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  eyeIcon: {
-    position: 'absolute',
-    right: 0,
     marginRight: 16,
   },
 });

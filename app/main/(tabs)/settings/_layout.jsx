@@ -40,7 +40,7 @@ function Settings() {
               <Icon name="help-circle" size={20} color="#fff" style={styles.icon} />
               <Text style={styles.buttonText}>Ajuda</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('sair')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('index')}>
               <Icon name="exit-to-app" size={20} color="#fff" style={styles.icon} />
               <Text style={styles.buttonText}>Sair</Text>
             </TouchableOpacity>

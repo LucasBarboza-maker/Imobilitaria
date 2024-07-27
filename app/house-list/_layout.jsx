@@ -6,7 +6,7 @@ import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInp
 import AnnouncementCard from '../../components/AnnouncementCard';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
-import localStorageService from '../../service/localStorageService';
+import localStorageService from '../service/localStorageService';
 
 // Create a custom theme
 const theme = {

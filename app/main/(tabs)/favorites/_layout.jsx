@@ -4,7 +4,7 @@ import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal } from 'react-native-paper';
 import FavoriteCard from '../../../../components/FavoriteCard';
-import localStorageService from '../../../../service/localStorageService';
+import localStorageService from '../../../service/localStorageService';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Create a custom theme

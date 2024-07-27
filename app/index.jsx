@@ -1,16 +1,35 @@
 import * as React from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import CustomCheckbox from '../components/CustomCheckbox'; // Supondo que o CustomCheckbox esteja no mesmo diretório
+import CustomCheckbox from '../components/CustomCheckbox';
+import localStorageService from './service/localStorageService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function LoginScreen({ }) {
+function LoginScreen() {
   const navigation = useNavigation();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [stayConnected, setStayConnected] = React.useState(false);
+
+  React.useEffect(() => {
+    const loadStoredCredentials = async () => {
+      try {
+        const storedUser = JSON.parse(await AsyncStorage.getItem('logged'));
+        if (storedUser) {
+          setUsername(storedUser.email);
+          setPassword(storedUser.password);
+          setStayConnected(true);
+        }
+      } catch (error) {
+        console.error('Error loading stored credentials', error);
+      }
+    };
+
+    loadStoredCredentials();
+  }, []);
 
   const inputTheme = {
     colors: {
@@ -19,6 +38,25 @@ function LoginScreen({ }) {
     },
   };
 
+  const handleLogin = async () => {
+    try {
+      const users = await localStorageService.getAllItems('users');
+      const user = users.find(user => user.email === username && user.password === password);
+
+      if (user) {
+        if (stayConnected) {
+          await AsyncStorage.setItem('logged', JSON.stringify({ email: username, password }));
+        } else {
+          await AsyncStorage.removeItem('logged');
+        }
+        navigation.navigate('main/(tabs)');
+      } else {
+        Alert.alert('Erro', 'Email ou senha incorretos');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login', error);
+    }
+  };
 
   return (
     <ImageBackground
@@ -27,7 +65,7 @@ function LoginScreen({ }) {
     >
       <View style={styles.container}>
         <Image
-          source={require('../assets/images/logo.png')} // Substitua pelo caminho da sua imagem de logo
+          source={require('../assets/images/logo.png')}
           style={styles.logo}
         />
         <Text style={styles.text}>Imobiliária</Text>
@@ -55,13 +93,13 @@ function LoginScreen({ }) {
           <CustomCheckbox
             checked={stayConnected}
             onPress={() => setStayConnected(!stayConnected)}
-            borderColor="#4A90E2" 
+            borderColor="#4A90E2"
           />
           <Text style={styles.checkboxLabel}>Manter-me conectado</Text>
         </View>
         <Button
           mode="contained"
-          onPress={() => navigation.navigate('main/(tabs)')}
+          onPress={handleLogin}
           style={styles.button}
         >
           Entrar
@@ -133,7 +171,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 8,
     backgroundColor: '#4A90E2',
-    fontSize:40
+    fontSize: 40,
   },
   forgotPassword: {
     color: '#FFFFFF',

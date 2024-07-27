@@ -52,6 +52,23 @@ class LocalStorageService {
     }
   }
 
+  async updateUserItem(collection, email, updatedItem) {
+    try {
+      let items = await this.getAllItems(collection);
+      const index = items.findIndex(item => item.email === email);
+      if (index !== -1) {
+        items[index] = updatedItem;
+        await AsyncStorage.setItem(COLLECTION_PREFIX + collection, JSON.stringify(items));
+        return updatedItem;
+      } else {
+        throw new Error('Item não encontrado');
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar item', error);
+      throw error;
+    }
+  }
+
   async deleteItem(collection, id) {
     try {
       let items = await this.getAllItems(collection);
@@ -59,6 +76,17 @@ class LocalStorageService {
       await AsyncStorage.setItem(COLLECTION_PREFIX + collection, JSON.stringify(items));
     } catch (error) {
       console.error('Erro ao deletar item', error);
+      throw error;
+    }
+  }
+
+  async logout(email) {
+    try {
+      let items = await this.getAllItems("logged");
+      items = items.filter(item => item.email !== email);
+      await AsyncStorage.setItem(COLLECTION_PREFIX + collection, JSON.stringify(items));
+    } catch (error) {
+      console.error('Erro ao deslogar', error);
       throw error;
     }
   }

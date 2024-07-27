@@ -7,7 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PagerView from 'react-native-pager-view';
-import localStorageService from '../../service/localStorageService';
+import localStorageService from '../service/localStorageService';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID
 
 // Create a custom theme

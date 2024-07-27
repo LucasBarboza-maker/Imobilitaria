@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeCard from '../../../../components/HomeCard';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput, Menu, Divider } from 'react-native-paper';
 import Slider from '@react-native-community/slider';
-import localStorageService from '../../../../service/localStorageService';
+import localStorageService from '../../../service/localStorageService';
 
 const theme = {
   ...DefaultTheme,
@@ -239,12 +239,11 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     borderColor: 'black',
-    borderWidth: 1,
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
     borderRadius: 20,
-    paddingLeft: 40,
-    paddingRight: 40,
+    paddingLeft: 20,
+    paddingRight: 20,
     color: 'black',
     backgroundColor: 'white',
   },

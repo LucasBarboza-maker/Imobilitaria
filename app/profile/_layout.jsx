@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, ToastAndroid} from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import localStorageService from '../service/localStorageService';
 
 // Create a custom theme
 const theme = {
@@ -18,10 +20,37 @@ const theme = {
 function Settings() {
   const navigation = useNavigation();
   const [nome, setNome] = React.useState('');
+  const [sobrenome, setSobreNome] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [celular, setCelular] = React.useState('');
   const [emailValid, setEmailValid] = React.useState(true);
   const [celularValid, setCelularValid] = React.useState(true);
+  const [username, setUsername] = React.useState();
+
+  React.useEffect(() => {
+    const loadStoredCredentials = async () => {
+      try {
+        const storedUser = JSON.parse(await AsyncStorage.getItem('logged'));
+        if (storedUser) {
+          const users = await localStorageService.getAllItems('users');
+          const user = users.find(user => user.email === storedUser.email);
+
+          setEmail(user.email);
+          setNome(user.name);
+          setSobreNome(user.surname);
+          handleCelularChange(user.phone);
+
+          setUsername(storedUser.email);
+        }
+      } catch (error) {
+        console.error('Error loading stored credentials', error);
+      }
+    };
+
+    loadStoredCredentials();
+  }, []);
+
+
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,7 +76,7 @@ function Settings() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const isEmailValid = validateEmail(email);
     const isCelularValid = validateCelular(celular);
 
@@ -55,7 +84,21 @@ function Settings() {
     setCelularValid(isCelularValid);
 
     if (isEmailValid && isCelularValid) {
-      console.log({ nome, email, celular });
+
+      const users = await localStorageService.getAllItems('users');
+      const user = users.find(user => user.email === username);
+
+      user.phone = celular.replace(/\D/g, '');
+      user.email = email;
+      user.name = nome;
+      
+      localStorageService.updateUserItem('users', user.email, user);
+
+      ToastAndroid.show('Sucesso ao alterar informações', ToastAndroid.SHORT);
+      setTimeout(() => {
+        navigation.goBack();
+      }, 3500); 
+
     } else {
       console.log("Invalid email or celular!");
     }
@@ -83,20 +126,12 @@ function Settings() {
             mode="outlined"
           />
           <TextInput
-            label="Email"
-            value={email}
-            onChangeText={text => {
-              setEmail(text);
-              setEmailValid(validateEmail(text));
-            }}
-            style={[styles.input, !emailValid && styles.errorInput]}
+            label="Sobrenome"
+            value={sobrenome}
+            onChangeText={text => setSobreNome(text)}
+            style={styles.input}
             mode="outlined"
-            keyboardType="email-address"
-            error={!emailValid}
           />
-          {!emailValid && (
-            <Text style={styles.errorText}>Email inválido</Text>
-          )}
           <TextInput
             label="Celular"
             value={celular}
