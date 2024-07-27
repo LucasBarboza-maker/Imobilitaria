@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
-import { TextInput, Button, ProgressBar, MD3Colors } from 'react-native-paper';
+import { TextInput, Button } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import localStorageService from '../../service/localStorageService';
 
-function RegisterScreen({ }) {
+function RegisterScreen() {
   const navigation = useNavigation();
   const [name, setName] = React.useState('');
   const [surname, setSurname] = React.useState('');
@@ -43,6 +44,37 @@ function RegisterScreen({ }) {
   const handlePasswordChange = (password) => {
     setPassword(password);
     setPasswordStrength(calculatePasswordStrength(password));
+  };
+
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      alert('As senhas não coincidem');
+      return;
+    }
+
+    const newUser = {
+      id: Date.now().toString(),
+      name,
+      surname,
+      email,
+      phone,
+      password,
+    };
+
+    try {
+      const users = await localStorageService.getAllItems('users');
+      const existingUser = users.find(user => user.email === email);
+
+      if (existingUser) {
+        alert('Este email já está registrado');
+        return;
+      }
+
+      await localStorageService.saveItem('users', newUser);
+      navigation.navigate('main/(tabs)');
+    } catch (error) {
+      console.error('Erro ao registrar usuário', error);
+    }
   };
 
   return (
@@ -118,7 +150,7 @@ function RegisterScreen({ }) {
         />
         <Button
           mode="contained"
-          onPress={() => navigation.navigate('main/(tabs)')}
+          onPress={handleRegister}
           style={styles.button}
         >
           Registrar

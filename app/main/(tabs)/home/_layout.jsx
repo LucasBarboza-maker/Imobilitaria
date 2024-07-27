@@ -4,7 +4,8 @@ import { useNavigation } from 'expo-router';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import HomeCard from '../../../../components/HomeCard';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput, Menu, Divider } from 'react-native-paper';
-import Slider from '@react-native-community/slider';  // Import Slider
+import Slider from '@react-native-community/slider';
+import localStorageService from '../../../../service/localStorageService';
 
 const theme = {
   ...DefaultTheme,
@@ -22,12 +23,19 @@ function HomeScreen() {
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [sliderValue, setSliderValue] = React.useState(50000);
   const [propertyType, setPropertyType] = React.useState('');
-  const [price, setPrice] = React.useState('');
   const [city, setCity] = React.useState('');
   const [neighborhood, setNeighborhood] = React.useState('');
   const [nearbyCollege, setNearbyCollege] = React.useState('');
-  const [description, setDescription] = React.useState('');
+  const [featuredHouses, setFeaturedHouses] = React.useState([]);
 
+  React.useEffect(() => {
+    const fetchFeaturedHouses = async () => {
+      const houses = await localStorageService.getAllItems('houses');
+      setFeaturedHouses(houses.slice(0, 5)); // Show the first 5 houses as featured
+    };
+
+    fetchFeaturedHouses();
+  }, []);
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
@@ -43,10 +51,8 @@ function HomeScreen() {
       neighborhood,
       nearbyCollege,
     };
-    console.log(filterCriteria);
-    // Apply filter logic here using filterCriteria object
+    navigation.navigate('house-list', { filters: filterCriteria });
   };
-
 
   return (
     <PaperProvider theme={theme}>
@@ -95,9 +101,9 @@ function HomeScreen() {
               <Text style={{ fontWeight: 'bold' }}>Anuncie</Text> seu imóvel e faça uma renda <Text style={{ fontWeight: 'bold' }}>extra!</Text>
             </Text>
           </View>
-          <View>
+          <TouchableOpacity onPress={() => navigation.navigate('create-house')}>
             <Icon name="chevron-right" size={48} color="#00509E" style={styles.chevronIcon} />
-          </View>
+          </TouchableOpacity>
         </View>
         <View style={styles.divider} />
         <View>
@@ -105,27 +111,17 @@ function HomeScreen() {
             <Text style={{ color: 'black', fontSize: 20 }}>Últimas visualizações:</Text>
           </View>
           <ScrollView contentContainerStyle={styles.containerScroll} horizontal={true}>
-            <HomeCard
-              title="Title 1"
-              value="$100"
-              icon="home"
-              padding={10}
-              imageSource={require('../../../../assets/images/home_bg_image.png')}
-            />
-            <HomeCard
-              title="Title 2"
-              value="$200"
-              icon="star"
-              padding={10}
-              imageSource={require('../../../../assets/images/home_bg_image.png')}
-            />
-            <HomeCard
-              title="Title 3"
-              value="$300"
-              icon="heart"
-              padding={10}
-              imageSource={require('../../../../assets/images/home_bg_image.png')}
-            />
+            {featuredHouses.map((house, index) => (
+              <TouchableOpacity key={index} onPress={() => navigation.navigate('house-details', { houseId: house.id })}>
+                <HomeCard
+                  title={house.city}
+                  value={`R$ ${house.price}`}
+                  icon="home"
+                  padding={10}
+                  imageSource={{ uri: house.images[0] }}
+                />
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
         <Portal>
@@ -244,8 +240,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: 'black',
     borderWidth: 1,
-    borderTopEndRadius:20,
-    borderTopStartRadius:20,
+    borderTopEndRadius: 20,
+    borderTopStartRadius: 20,
     borderRadius: 20,
     paddingLeft: 40,
     paddingRight: 40,
