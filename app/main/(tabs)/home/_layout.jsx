@@ -82,9 +82,6 @@ function HomeScreen() {
                     onSubmitEditing={handleSearchSubmit}
                     style={styles.searchInput}
                   />
-                  <TouchableOpacity onPress={() => setFilterVisible(true)}>
-                    <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
-                  </TouchableOpacity>
                 </View>
               </View>
               <View style={{ width: '70%', paddingHorizontal: 20, height: '25%', alignContent: 'flex-end', justifyContent: 'flex-end' }}>

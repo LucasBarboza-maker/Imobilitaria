@@ -5,9 +5,8 @@ import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import AnnouncementCard from '../../../../components/AnnouncementCard';
 import localStorageService from '../../../service/localStorageService';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFocusEffect } from '@react-navigation/native';
 
-// Create a custom theme
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -21,20 +20,20 @@ function UserAnnouncementsScreen() {
   const navigation = useNavigation();
   const [announcements, setAnnouncements] = React.useState([]);
 
-  React.useEffect(() => {
-    const fetchUserAnnouncements = async () => {
-      const loggedUser = await localStorageService.getAllItems('logged');
-      if (loggedUser.length === 0) {
-        return;
-      }
+  const fetchUserAnnouncements = async () => {
+    const loggedUser = await localStorageService.getAllItems('logged');
+    if (loggedUser.length === 0) {
+      return;
+    }
 
-      const houses = await localStorageService.getAllItems('houses');
-      const userAnnouncements = houses.filter(house => house.announcer.id === loggedUser[0].id);
-      setAnnouncements(userAnnouncements);
-    };
+    const houses = await localStorageService.getAllItems('houses');
+    const userAnnouncements = houses.filter(house => house.announcer.id === loggedUser[0].id);
+    setAnnouncements(userAnnouncements);
+  };
 
+  useFocusEffect (() => {
     fetchUserAnnouncements();
-  }, []);
+  });
 
   return (
     <PaperProvider theme={theme}>
@@ -43,7 +42,7 @@ function UserAnnouncementsScreen() {
         <View style={styles.headerContainer}>
           <View style={styles.section}>
             <Text style={styles.text}>Meus Anúncios</Text>
-            <Button mode="contained" onPress={() => {navigation.navigate('create-house')}}>
+            <Button mode="contained" onPress={() => { navigation.navigate('create-house') }}>
               Criar
             </Button>
           </View>
@@ -65,6 +64,9 @@ function UserAnnouncementsScreen() {
                     description={announcement.description}
                     icon="home"
                     imageSource={{ uri: announcement.images[0] }}
+                    id={announcement.id}
+                    refresh={fetchUserAnnouncements}
+                    navigation={navigation}
                   />
                 </TouchableOpacity>
               ))}

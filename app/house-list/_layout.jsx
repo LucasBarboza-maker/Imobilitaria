@@ -3,10 +3,11 @@ import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, 
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput, Menu } from 'react-native-paper';
-import AnnouncementCard from '../../components/AnnouncementCard';
+import FavoriteCard from '../../components/FavoriteCard';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
 import localStorageService from '../service/localStorageService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Create a custom theme
 const theme = {
@@ -17,6 +18,7 @@ const theme = {
     primary: '#2457C5',
   },
 };
+
 
 function AnnouncementsScreen() {
   const navigation = useNavigation();
@@ -29,12 +31,20 @@ function AnnouncementsScreen() {
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [sliderValue, setSliderValue] = React.useState(50000);
   const [announcements, setAnnouncements] = React.useState([]);
+  const [visible, setVisible] = React.useState(false);
+  const [id, setId] = React.useState(null);
+  const hideModal = () => setVisible(false);
+  const [storedUser, setStoredUser] = React.useState({});
+const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useState("adicionar");
+
+  async function fetchAnnouncements() {
+    setStoredUser(JSON.parse(await AsyncStorage.getItem('logged')));
+    const houses = await localStorageService.getAllItems('houses');
+    setAnnouncements(houses);
+  };
 
   React.useEffect(() => {
-    const fetchAnnouncements = async () => {
-      const houses = await localStorageService.getAllItems('houses');
-      setAnnouncements(houses);
-    };
+
 
     fetchAnnouncements();
   }, []);
@@ -67,6 +77,50 @@ function AnnouncementsScreen() {
     setAnnouncements(filteredAnnouncements);
   };
 
+  const removeOrAddAnnouncement = async () => {
+    const houses = await localStorageService.getAllItems('houses');
+    const house = houses.find(house => house.id === id);
+
+    if (storedUser) {
+      const users = await localStorageService.getAllItems('users');
+      const user = users.find(user => user.email === storedUser.email);
+
+      if (house.favoriteUsers) {
+
+        if (checarFavorito(house) == 'red') {
+          house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email != storedUser.email);
+        } else {
+          house.favoriteUsers.push(user);
+        }
+      } else {
+        house.favoriteUsers = [];
+        house.favoriteUsers.push(user);
+      }
+
+      localStorageService.updateItem('houses', house.id, house);
+
+    }
+    fetchAnnouncements()
+    hideModal();
+
+  };
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  function checarFavorito(announcement) {
+    let favoriteUser = []
+    if (announcement.favoriteUsers) {
+      favoriteUser.push(announcement.favoriteUsers.filter(fav => fav.email == storedUser.email))
+
+      if (favoriteUser[0].length > 0) {
+        return "red";
+      }
+    }
+
+    return "gray";
+  }
+
   return (
     <PaperProvider theme={theme}>
       <SafeAreaView style={styles.safeArea}>
@@ -97,18 +151,19 @@ function AnnouncementsScreen() {
           ) : (
             <View style={styles.cardsContainer}>
               {announcements.map((announcement, index) => (
-                <TouchableOpacity
+                <FavoriteCard
                   key={index}
-                  onPress={() => navigation.navigate('house-details', { houseId: announcement.id })}
-                >
-                  <AnnouncementCard
-                    title={announcement.city}
-                    value={announcement.price}
-                    description={announcement.description}
-                    icon="home"
-                    imageSource={{ uri: announcement.images[0] }}
-                  />
-                </TouchableOpacity>
+                  id={announcement.id}
+                  title={announcement.city}
+                  value={announcement.price}
+                  description={announcement.description}
+                  icon="home"
+                  imageSource={{ uri: announcement.images[0] }}
+                  onPress={showModal}
+                  setId={setId}
+                  heartColor={checarFavorito(announcement)}
+                  setTextoParaRemoverOuAdicionar={setTextoParaRemoverOuAdicionar}
+                />
               ))}
             </View>
           )}
@@ -174,6 +229,15 @@ function AnnouncementsScreen() {
                 Aplicar Filtros
               </Button>
             </ScrollView>
+          </Modal>
+        </Portal>
+        <Portal>
+          <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer}>
+            <Text>Deseja {textoParaRemoverOuAdicionar} este anúncio dos favoritos?</Text>
+            <View style={styles.modalButtons}>
+              <Button onPress={hideModal} mode="contained" style={styles.modalButton}>Não</Button>
+              <Button onPress={removeOrAddAnnouncement} mode="contained" style={styles.modalButton}>Sim</Button>
+            </View>
           </Modal>
         </Portal>
       </SafeAreaView>
@@ -300,6 +364,20 @@ const styles = StyleSheet.create({
   sliderContainer: {
     marginVertical: 16,
     alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  modalButton: {
+    marginHorizontal: 10,
   },
 });
 

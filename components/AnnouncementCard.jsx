@@ -1,14 +1,52 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import localStorageService from '../app/service/localStorageService';
 
-const AnnouncementCard = ({ title, value, icon, imageSource, description }) => {
+const AnnouncementCard = ({ title, value, icon, imageSource, description, id, refresh, navigation }) => {
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirmação de Exclusão",
+      "Tem certeza de que deseja excluir este anúncio?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+          onPress: () => console.log("Cancel Pressed"),
+        },
+        {
+          text: "Sim",
+          onPress: async () => {
+
+            const houses = await localStorageService.getAllItems('houses');
+            const house = houses.filter(house => house.id === id);
+
+            if(house){
+              localStorageService.deleteItem('houses', house[0].id);
+              refresh()
+            }
+
+
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const goToEditScreen = () => {
+    navigation.navigate("", {id:id})
+  }
+
   return (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image source={imageSource} style={styles.image} />
-        <TouchableOpacity style={styles.editIcon}>
+        <TouchableOpacity style={styles.editIcon} onPress={goToEditScreen}>
           <MaterialIcons name="edit" size={24} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.deleteIcon} onPress={handleDelete}>
+          <MaterialIcons name="delete" size={24} color="red" />
         </TouchableOpacity>
         <View style={styles.bottomContainer}>
           <Text style={styles.title}>{title}</Text>
@@ -44,6 +82,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   editIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 50,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 12,
+    padding: 4,
+  },
+  deleteIcon: {
     position: 'absolute',
     top: 10,
     right: 10,

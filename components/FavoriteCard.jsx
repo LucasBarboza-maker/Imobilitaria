@@ -3,19 +3,19 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-const AnnouncementCard = ({ id, title, value, icon, imageSource, description, onPress }) => {
+const AnnouncementCard = ({ id, title, value, icon, imageSource, description, onPress, setId, heartColor, setTextoParaRemoverOuAdicionar}) => {
   const navigation = useNavigation();
 
   function goToDetailScreen(id) {
-    navigation.navigate('house-details', { id });
+    navigation.navigate('house-details', { houseId: id});
   }
 
   return (
     <TouchableOpacity style={styles.card} onPress={() => goToDetailScreen(id)}>
       <View style={styles.imageContainer}>
         <Image source={imageSource} style={styles.image} />
-        <TouchableOpacity style={styles.editIcon} onPress={onPress}>
-          <MaterialIcons name="favorite" size={24} color="red" />
+        <TouchableOpacity style={styles.editIcon} onPress={() => {setId(id); heartColor=='red'? setTextoParaRemoverOuAdicionar("remover") : setTextoParaRemoverOuAdicionar("adicionar"); onPress()}}>
+          <MaterialIcons name="favorite" size={24} color={heartColor} />
         </TouchableOpacity>
         <View style={styles.bottomContainer}>
           <Text style={styles.title}>{title}</Text>

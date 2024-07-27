@@ -28,7 +28,7 @@ class LocalStorageService {
   async getItemById(collection, id) {
     try {
       const items = await this.getAllItems(collection);
-      return items.find(item => item.id === id);
+      return JSON.parse(items.find(item => item.id == id));
     } catch (error) {
       console.error('Erro ao recuperar item', error);
       throw error;
@@ -36,9 +36,10 @@ class LocalStorageService {
   }
 
   async updateItem(collection, id, updatedItem) {
+    console.log(id);
     try {
       let items = await this.getAllItems(collection);
-      const index = items.findIndex(item => item.id === id);
+      const index = items.findIndex(item => item.id == id);
       if (index !== -1) {
         items[index] = updatedItem;
         await AsyncStorage.setItem(COLLECTION_PREFIX + collection, JSON.stringify(items));
@@ -73,6 +74,8 @@ class LocalStorageService {
     try {
       let items = await this.getAllItems(collection);
       items = items.filter(item => item.id !== id);
+
+      console.log(id);
       await AsyncStorage.setItem(COLLECTION_PREFIX + collection, JSON.stringify(items));
     } catch (error) {
       console.error('Erro ao deletar item', error);

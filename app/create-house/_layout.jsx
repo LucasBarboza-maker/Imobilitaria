@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, Image, Alert, Dimensions, ScrollView } from 'react-native';
-import { useNavigation } from 'expo-router';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, Image, Alert, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Menu, TextInput } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
@@ -25,6 +25,7 @@ const { width: viewportWidth } = Dimensions.get('window');
 
 function CreateHouseScreen() {
   const navigation = useNavigation();
+  const [id, setId] = React.useState('');
   const [propertyType, setPropertyType] = React.useState('');
   const [price, setPrice] = React.useState('');
   const [city, setCity] = React.useState('');
@@ -33,16 +34,48 @@ function CreateHouseScreen() {
   const [description, setDescription] = React.useState('');
   const [images, setImages] = React.useState([]);
   const [menuVisible, setMenuVisible] = React.useState(false);
+  const params = useLocalSearchParams();
+
+  const [errors, setErrors] = React.useState({
+    propertyType: false,
+    price: false,
+    city: false,
+    neighborhood: false,
+    nearbyCollege: false,
+    description: false,
+  });
+
+  // React.useEffect(() => {
+  //   const loadImages = async () => {
+  //     const savedImages = await AsyncStorage.getItem('uploadedImages');
+  //     if (savedImages) {
+  //       setImages(JSON.parse(savedImages));
+  //     }
+  //   };
+  //   loadImages();
+  // }, []);
 
   React.useEffect(() => {
-    const loadImages = async () => {
-      const savedImages = await AsyncStorage.getItem('uploadedImages');
-      if (savedImages) {
-        setImages(JSON.parse(savedImages));
-      }
-    };
-    loadImages();
-  }, []);
+
+    const fetchUserAnnouncements = async () => {
+      const houses = await localStorageService.getAllItems('houses', params.id);
+      const house = houses.filter((house) => house.id == params.id);
+
+      setId(params.id)
+      setPropertyType(house[0].propertyType);
+      setPrice(house[0].price);
+      setCity(house[0].city);
+      setNeighborhood(house[0].neighborhood);
+      setNearbyCollege(house[0].nearbyCollege);
+      setDescription(house[0].description);
+      setImages(house[0].images);
+
+    }
+
+    if (params.id) {
+      fetchUserAnnouncements()
+    }
+  }, [])
 
   const handleImageUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -86,7 +119,7 @@ function CreateHouseScreen() {
           style: "cancel"
         },
         {
-          text: "Delete", 
+          text: "Delete",
           onPress: async () => {
             const updatedImages = images.filter((_, i) => i !== index);
             setImages(updatedImages);
@@ -99,6 +132,20 @@ function CreateHouseScreen() {
   };
 
   const handleSubmit = async () => {
+    const newErrors = {
+      propertyType: !propertyType,
+      price: !price,
+      city: !city,
+      neighborhood: !neighborhood,
+      nearbyCollege: !nearbyCollege,
+      description: !description,
+    };
+
+    if (Object.values(newErrors).some(error => error)) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       const loggedUser = await localStorageService.getAllItems('logged');
       if (loggedUser.length === 0) {
@@ -106,8 +153,8 @@ function CreateHouseScreen() {
         return;
       }
 
-      const newHouse = {
-        id: uuidv4(), // Generate UUID for the house
+      const house = {
+        id: id ? id : Date.now(),
         propertyType,
         price,
         city,
@@ -118,18 +165,20 @@ function CreateHouseScreen() {
         announcer: loggedUser[0],
       };
 
-      await localStorageService.saveItem('houses', newHouse);
+      if (id == null || id == undefined) {
 
-      // Clear the input fields
-      setPropertyType('');
-      setPrice('');
-      setCity('');
-      setNeighborhood('');
-      setNearbyCollege('');
-      setDescription('');
-      setImages([]);
+        await localStorageService.saveItem('houses', house);
+        Alert.alert("Sucesso", "Imóvel adicionado com sucesso");
 
-      Alert.alert("Sucesso", "Imóvel adicionado com sucesso");
+      } else {
+        Alert.alert("Sucesso", "Imóvel atualizado com sucesso");
+        await localStorageService.updateItem('houses', house.id, house);
+
+      }
+      setTimeout(() => {
+        navigation.goBack();
+      }, 3500);
+
     } catch (error) {
       console.error('Erro ao adicionar imóvel', error);
       Alert.alert('Erro', 'Erro ao adicionar imóvel');
@@ -162,14 +211,15 @@ function CreateHouseScreen() {
         </Button>
 
         <ScrollView>
-          <View>
+          <View style={{ borderWidth: 1, borderColor: errors.propertyType ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
             <Menu
               visible={menuVisible}
               onDismiss={() => setMenuVisible(false)}
               anchor={
-                <Button onPress={() => setMenuVisible(true)}>
-                  Tipo de Imóvel
-                </Button>
+                <TouchableOpacity onPress={() => setMenuVisible(true)} style={styles.menuButton}>
+                  <Text style={styles.menuText}>{propertyType || 'Selecione o tipo de imóvel'}</Text>
+                  <Icon name="arrow-drop-down" size={24} color="#000" />
+                </TouchableOpacity>
               }
             >
               <Menu.Item onPress={() => { setPropertyType('Casa'); setMenuVisible(false); }} title="Casa" />
@@ -177,48 +227,58 @@ function CreateHouseScreen() {
               <Menu.Item onPress={() => { setPropertyType('Apartamento'); setMenuVisible(false); }} title="Apartamento" />
               <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setMenuVisible(false); }} title="Imóvel Compartilhado" />
             </Menu>
-            <Text>{propertyType}</Text>
           </View>
+          {errors.propertyType && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
           <TextInput
             label="Valor do Imóvel"
             value={price}
             onChangeText={text => setPrice(text)}
-            style={styles.input}
+            style={[styles.input, errors.price && styles.errorInput]}
             keyboardType="numeric"
+            mode="outlined"
           />
+          {errors.price && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
           <TextInput
             label="Cidade"
             value={city}
             onChangeText={text => setCity(text)}
-            style={styles.input}
+            style={[styles.input, errors.city && styles.errorInput]}
+            mode="outlined"
           />
+          {errors.city && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
           <TextInput
             label="Bairro"
             value={neighborhood}
             onChangeText={text => setNeighborhood(text)}
-            style={styles.input}
+            style={[styles.input, errors.neighborhood && styles.errorInput]}
+            mode="outlined"
           />
+          {errors.neighborhood && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
           <TextInput
             label="Faculdade Próxima"
             value={nearbyCollege}
             onChangeText={text => setNearbyCollege(text)}
-            style={styles.input}
+            style={[styles.input, errors.nearbyCollege && styles.errorInput]}
+            mode="outlined"
           />
+          {errors.nearbyCollege && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
           <TextInput
             label="Descrição"
             value={description}
             onChangeText={text => setDescription(text)}
-            style={[styles.input, styles.descriptionInput]}
+            style={[styles.input, styles.descriptionInput, errors.description && styles.errorInput]}
             multiline
+            mode="outlined"
           />
+          {errors.description && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
           <Button mode="contained" onPress={handleSubmit} style={styles.button}>
-            Adicionar Imóvel
+            {id ? 'Editar' : 'Adicionar'} Imóvel
           </Button>
         </ScrollView>
       </SafeAreaView>
@@ -244,15 +304,18 @@ const styles = StyleSheet.create({
   },
   input: {
     marginTop: 16,
-    marginBottom: 16,
+    marginBottom: 4,
     backgroundColor: '#fff',
+  },
+  errorInput: {
+    borderColor: 'red',
   },
   button: {
     marginVertical: 16,
   },
   pagerView: {
     width: viewportWidth,
-    height: viewportWidth,
+    height: 200,
     marginBottom: 16,
   },
   imageContainer: {
@@ -272,6 +335,22 @@ const styles = StyleSheet.create({
   },
   descriptionInput: {
     height: 100,
+  },
+  menuButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  menuText: {
+    flex: 1,
+    fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 16,
+    marginTop: 0,
   },
 });
 

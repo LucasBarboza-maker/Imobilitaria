@@ -130,7 +130,7 @@ function DetailScreen() {
           <View style={styles.commentsContainer}>
             <View style={styles.commentsHeader}>
               <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>Comentários:</Text>
-              <Button mode="contained" onPress={() => setModalVisible(true)}>
+              <Button mode="contained" onPress={() => setModalVisible(true)} >
                 Comentar
               </Button>
             </View>
