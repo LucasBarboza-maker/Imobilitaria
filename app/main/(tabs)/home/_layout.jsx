@@ -34,8 +34,12 @@ function HomeScreen() {
       setFeaturedHouses(houses.slice(0, 5)); // Show the first 5 houses as featured
     };
 
-    fetchFeaturedHouses();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchFeaturedHouses();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
