@@ -47,7 +47,7 @@ function HomeScreen() {
     // Apply filter logic here using filterCriteria object
   };
 
-
+//
   return (
     <PaperProvider theme={theme}>
       <ScrollView style={styles.container}>
