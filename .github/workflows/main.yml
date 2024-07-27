@@ -1,0 +1,30 @@
+name: iOS Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+    - name: Install Dependencies
+      run: npm install
+    - name: Prebuild for iOS
+      run: npx expo prebuild
+    - name: Install CocoaPods
+      run: |
+        cd ios
+        pod install
+    - name: Build iOS Project
+      run: |
+        eas build --platform ios --profile simulator
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ios-build
+        path: build
