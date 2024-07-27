@@ -92,6 +92,9 @@ function HomeScreen() {
                   Hospede-se pertinho da sua <Text style={{ fontWeight: 'bold' }}>Faculdade</Text>
                 </Text>
               </View>
+              <TouchableOpacity style={styles.listButton} onPress={() => navigation.navigate('house-list')}>
+                <Icon name="format-list-bulleted" size={24} color="#fff" />
+              </TouchableOpacity>
             </ImageBackground>
           </View>
         </View>
@@ -298,6 +301,14 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 16,
     backgroundColor: '#fff',
+  },
+  listButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#2457C5',
+    borderRadius: 50,
+    padding: 10,
   },
 });
 
