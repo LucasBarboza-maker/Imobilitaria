@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, Keyboard } from 'react-native';
-import { useNavigation } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Modal, Portal, TextInput, Menu } from 'react-native-paper';
 import FavoriteCard from '../../components/FavoriteCard';
@@ -19,10 +19,11 @@ const theme = {
   },
 };
 
-
 function AnnouncementsScreen() {
   const navigation = useNavigation();
-  const [search, setSearch] = React.useState('');
+  const params = useLocalSearchParams();
+  const searchQuery = params.searchQuery;
+  const [search, setSearch] = React.useState(searchQuery || '');
   const [filterVisible, setFilterVisible] = React.useState(false);
   const [propertyType, setPropertyType] = React.useState('');
   const [city, setCity] = React.useState('');
@@ -35,27 +36,41 @@ function AnnouncementsScreen() {
   const [id, setId] = React.useState(null);
   const hideModal = () => setVisible(false);
   const [storedUser, setStoredUser] = React.useState({});
-const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useState("adicionar");
+  const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useState("adicionar");
 
   async function fetchAnnouncements() {
     setStoredUser(JSON.parse(await AsyncStorage.getItem('logged')));
     const houses = await localStorageService.getAllItems('houses');
     setAnnouncements(houses);
-  };
+    if (searchQuery && searchQuery.trim() !== '') {
+      handleSearchSubmit(searchQuery, houses);
+    }
+  }
 
   React.useEffect(() => {
-
-
     fetchAnnouncements();
-  }, []);
+  }, [searchQuery]);
 
-  const handleSearchSubmit = () => {
+  const handleSearchSubmit = async (searchTerm, houses) => {
     Keyboard.dismiss();
-    applyFilters();
+    const searchValue = searchTerm || search;
+    if (searchValue.trim() === '') return;
+
+    if (!houses) {
+      houses = await localStorageService.getAllItems('houses');
+    }
+
+    const searchResults = houses.filter((announcement) =>
+      String(announcement.city).toLowerCase().includes(searchValue.toLowerCase()) ||
+      String(announcement.neighborhood).toLowerCase().includes(searchValue.toLowerCase()) ||
+      String(announcement.price).includes(searchValue) ||
+      String(announcement.nearbyCollege).includes(searchValue)
+    );
+    setAnnouncements(searchResults);
   };
 
-  const applyFilters = () => {
-    setFilterVisible(false);
+  const applyFilters = async () => {
+    const houses = await localStorageService.getAllItems('houses');
     const filterCriteria = {
       propertyType,
       city,
@@ -64,17 +79,31 @@ const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useS
       price: sliderValue,
     };
 
-    const filteredAnnouncements = announcements.filter((announcement) => {
+    const filteredAnnouncements = houses.filter((announcement) => {
       return (
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
         (!filterCriteria.city || announcement.city === filterCriteria.city) &&
         (!filterCriteria.neighborhood || announcement.neighborhood === filterCriteria.neighborhood) &&
         (!filterCriteria.nearbyCollege || announcement.nearbyCollege === filterCriteria.nearbyCollege) &&
-        (announcement.price <= filterCriteria.price)
+        (Math.abs(announcement.price - filterCriteria.price) <= 1000)
       );
     });
 
     setAnnouncements(filteredAnnouncements);
+    setFilterVisible(false);
+  };
+
+  const resetFilters = () => {
+    setPropertyType('');
+    setCity('');
+    setNeighborhood('');
+    setNearbyCollege('');
+    setSliderValue(50000);
+  };
+
+  const openFilterModal = () => {
+    resetFilters();
+    setFilterVisible(true);
   };
 
   const removeOrAddAnnouncement = async () => {
@@ -86,9 +115,8 @@ const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useS
       const user = users.find(user => user.email === storedUser.email);
 
       if (house.favoriteUsers) {
-
-        if (checarFavorito(house) == 'red') {
-          house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email != storedUser.email);
+        if (checarFavorito(house) === 'red') {
+          house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email !== storedUser.email);
         } else {
           house.favoriteUsers.push(user);
         }
@@ -98,26 +126,23 @@ const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useS
       }
 
       localStorageService.updateItem('houses', house.id, house);
-
     }
-    fetchAnnouncements()
+    fetchAnnouncements();
     hideModal();
-
   };
+
   const showModal = () => {
     setVisible(true);
   };
 
   function checarFavorito(announcement) {
-    let favoriteUser = []
+    let favoriteUser = [];
     if (announcement.favoriteUsers) {
-      favoriteUser.push(announcement.favoriteUsers.filter(fav => fav.email == storedUser.email))
-
-      if (favoriteUser[0].length > 0) {
+      favoriteUser = announcement.favoriteUsers.filter(fav => fav.email === storedUser.email);
+      if (favoriteUser.length > 0) {
         return "red";
       }
     }
-
     return "gray";
   }
 
@@ -136,10 +161,10 @@ const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useS
               placeholderTextColor="#aaaaaa"
               value={search}
               onChangeText={text => setSearch(text)}
-              onSubmitEditing={handleSearchSubmit}
+              onSubmitEditing={() => handleSearchSubmit()}
               style={styles.searchInput}
             />
-            <TouchableOpacity onPress={() => setFilterVisible(true)}>
+            <TouchableOpacity onPress={openFilterModal}>
               <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
             </TouchableOpacity>
           </View>

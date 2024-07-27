@@ -37,7 +37,7 @@ function DetailScreen() {
     fetchHouseDetails();
   }, [houseId]);
 
-  const handleAddComment = async () => {
+  const handleAddComment = async (comment) => {
     const loggedUser = await localStorageService.getAllItems('logged');
     if (loggedUser.length === 0) {
       Alert.alert('Erro', 'Nenhum usuário está logado');
@@ -45,7 +45,7 @@ function DetailScreen() {
     }
 
     const newCommentWithUser = {
-      ...newComment,
+      ...comment,
       name: loggedUser[0].name,
     };
 
@@ -134,14 +134,18 @@ function DetailScreen() {
                 Comentar
               </Button>
             </View>
-            {comments.map((comment, index) => (
-              <CommentCard
-                key={index}
-                name={comment.name}
-                comment={comment.comment}
-                rating={comment.rating}
-              />
-            ))}
+            {comments.length === 0 ? (
+              <Text style={styles.emptyText}>Sem comentários registrados</Text>
+            ) : (
+              comments.map((comment, index) => (
+                <CommentCard
+                  key={index}
+                  name={comment.name}
+                  comment={comment.comment}
+                  rating={comment.rating}
+                />
+              ))
+            )}
           </View>
         </ScrollView>
         <Portal>
@@ -156,7 +160,7 @@ function DetailScreen() {
             <View style={styles.starContainer}>
               {renderStars()}
             </View>
-            <Button mode="contained" onPress={handleAddComment}>
+            <Button mode="contained" onPress={() => handleAddComment(newComment)}>
               Adicionar
             </Button>
           </Modal>
@@ -225,6 +229,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#999',
   },
   modal: {
     backgroundColor: 'white',

@@ -35,7 +35,7 @@ const AnnouncementCard = ({ title, value, icon, imageSource, description, id, re
   };
 
   const goToEditScreen = () => {
-    navigation.navigate("", {id:id})
+    navigation.navigate("create-house", {id:id})
   }
 
   return (

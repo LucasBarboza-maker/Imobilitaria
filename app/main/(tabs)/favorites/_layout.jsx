@@ -19,7 +19,6 @@ const theme = {
   },
 };
 
-
 function FavoritesScreen() {
   const navigation = useNavigation();
   const [search, setSearch] = React.useState('');
@@ -37,25 +36,33 @@ function FavoritesScreen() {
   const [storedUser, setStoredUser] = React.useState({});
   const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useState("adicionar");
 
-  async function fetchAnnouncements() {
-    setStoredUser(JSON.parse(await AsyncStorage.getItem('logged')));
+  async function fetchFavoriteAnnouncements() {
+    const user = JSON.parse(await AsyncStorage.getItem('logged'));
+    setStoredUser(user);
+
     const houses = await localStorageService.getAllItems('houses');
-    setAnnouncements(houses);
-  };
+    const favoriteHouses = houses.filter(house => house.favoriteUsers && house.favoriteUsers.some(fav => fav.email === user.email));
+    setAnnouncements(favoriteHouses);
+  }
 
   React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchFavoriteAnnouncements();
+    });
 
-
-    fetchAnnouncements();
-  }, []);
+    return unsubscribe;
+  }, [navigation]);
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
     applyFilters();
   };
 
-  const applyFilters = () => {
-    setFilterVisible(false);
+  const applyFilters = async () => {
+    const user = JSON.parse(await AsyncStorage.getItem('logged'));
+    const houses = await localStorageService.getAllItems('houses');
+    const favoriteHouses = houses.filter(house => house.favoriteUsers && house.favoriteUsers.some(fav => fav.email === user.email));
+    
     const filterCriteria = {
       propertyType,
       city,
@@ -64,7 +71,7 @@ function FavoritesScreen() {
       price: sliderValue,
     };
 
-    const filteredAnnouncements = announcements.filter((announcement) => {
+    const filteredAnnouncements = favoriteHouses.filter((announcement) => {
       return (
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
         (!filterCriteria.city || announcement.city === filterCriteria.city) &&
@@ -75,6 +82,7 @@ function FavoritesScreen() {
     });
 
     setAnnouncements(filteredAnnouncements);
+    setFilterVisible(false);
   };
 
   const removeOrAddAnnouncement = async () => {
@@ -86,9 +94,8 @@ function FavoritesScreen() {
       const user = users.find(user => user.email === storedUser.email);
 
       if (house.favoriteUsers) {
-
-        if (checarFavorito(house) == 'red') {
-          house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email != storedUser.email);
+        if (checarFavorito(house) === 'red') {
+          house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email !== storedUser.email);
         } else {
           house.favoriteUsers.push(user);
         }
@@ -98,26 +105,23 @@ function FavoritesScreen() {
       }
 
       localStorageService.updateItem('houses', house.id, house);
-
     }
-    fetchAnnouncements()
+    fetchFavoriteAnnouncements();
     hideModal();
-
   };
+
   const showModal = () => {
     setVisible(true);
   };
 
   function checarFavorito(announcement) {
-    let favoriteUser = []
+    let favoriteUser = [];
     if (announcement.favoriteUsers) {
-      favoriteUser.push(announcement.favoriteUsers.filter(fav => fav.email == storedUser.email))
-
-      if (favoriteUser[0].length > 0) {
+      favoriteUser = announcement.favoriteUsers.filter(fav => fav.email === storedUser.email);
+      if (favoriteUser.length > 0) {
         return "red";
       }
     }
-
     return "gray";
   }
 
@@ -150,24 +154,21 @@ function FavoritesScreen() {
             <Text style={styles.emptyText}>Sem anúncios registrados</Text>
           ) : (
             <View style={styles.cardsContainer}>
-              {announcements.map((announcement, index) => {
-                if (checarFavorito(announcement) == 'red') {
-                  return (<FavoriteCard
-                    key={index}
-                    id={announcement.id}
-                    title={announcement.city}
-                    value={announcement.price}
-                    description={announcement.description}
-                    icon="home"
-                    imageSource={{ uri: announcement.images[0] }}
-                    onPress={showModal}
-                    setId={setId}
-                    heartColor={checarFavorito(announcement)}
-                    setTextoParaRemoverOuAdicionar={setTextoParaRemoverOuAdicionar}
-                  />)
-                }
-
-              })}
+              {announcements.map((announcement, index) => (
+                <FavoriteCard
+                  key={index}
+                  id={announcement.id}
+                  title={announcement.city}
+                  value={announcement.price}
+                  description={announcement.description}
+                  icon="home"
+                  imageSource={{ uri: announcement.images[0] }}
+                  onPress={showModal}
+                  setId={setId}
+                  heartColor={checarFavorito(announcement)}
+                  setTextoParaRemoverOuAdicionar={setTextoParaRemoverOuAdicionar}
+                />
+              ))}
             </View>
           )}
         </ScrollView>

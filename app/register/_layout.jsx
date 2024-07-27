@@ -71,7 +71,7 @@ function RegisterScreen() {
       }
 
       await localStorageService.saveItem('users', newUser);
-      navigation.navigate('main/(tabs)');
+      navigation.navigate('index');
     } catch (error) {
       console.error('Erro ao registrar usuário', error);
     }

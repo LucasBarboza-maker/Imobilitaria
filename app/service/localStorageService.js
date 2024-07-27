@@ -83,6 +83,18 @@ class LocalStorageService {
     }
   }
 
+  async deleteAllItems(collection) {
+    try {
+      await AsyncStorage.setItem(COLLECTION_PREFIX + collection, JSON.stringify([]));
+      console.log(`Todos os itens da coleção ${collection} foram deletados.`);
+    } catch (error) {
+      console.error('Erro ao deletar todos os itens', error);
+      throw error;
+    }
+  }
+  
+
+
   async logout(email) {
     try {
       let items = await this.getAllItems("logged");
@@ -103,7 +115,48 @@ class LocalStorageService {
       throw error;
     }
   }
+
+  
+  async filterItems(collection, filterCriteria) {
+    try {
+      const items = await this.getAllItems(collection);
+      return items.filter(item => {
+        return Object.keys(filterCriteria).every(key => {
+          if (filterCriteria[key] === '') return true;
+          if (key === 'price') return item[key] <= filterCriteria[key];
+          return item[key] === filterCriteria[key];
+        });
+      });
+    } catch (error) {
+      console.error('Erro ao filtrar itens', error);
+      throw error;
+    }
+  }
+
+  async filterItemsByCriteria(collection, criteria) {
+    try {
+      const items = await this.getAllItems(collection);
+      return items.filter(item => {
+        return Object.keys(criteria).every(key => {
+          if (criteria[key] === '') return true; // Skip empty criteria
+          if (key === 'price') return item[key] <= criteria[key]; // Special handling for price
+          return item[key] === criteria[key];
+        });
+      });
+    } catch (error) {
+      console.error('Erro ao filtrar itens', error);
+      throw error;
+    }
+  }
+
+
 }
+
+
+
+
+
+
 
 const localStorageService = new LocalStorageService();
 export default localStorageService;

@@ -39,7 +39,9 @@ function HomeScreen() {
 
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
-    navigation.navigate('house-list', { searchQuery: search });
+    if (search.trim() !== '') {
+      navigation.navigate('house-list', { searchQuery: search });
+    }
   };
 
   const applyFilters = () => {

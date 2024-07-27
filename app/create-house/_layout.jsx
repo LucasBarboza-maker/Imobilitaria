@@ -165,7 +165,7 @@ function CreateHouseScreen() {
         announcer: loggedUser[0],
       };
 
-      if (id == null || id == undefined) {
+      if (id === '') {
 
         await localStorageService.saveItem('houses', house);
         Alert.alert("Sucesso", "Imóvel adicionado com sucesso");
