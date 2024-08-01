@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, Image, Alert, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, Alert, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Menu, TextInput } from 'react-native-paper';
@@ -10,7 +10,6 @@ import PagerView from 'react-native-pager-view';
 import localStorageService from '../service/localStorageService';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID
 
-// Create a custom theme
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -23,59 +22,72 @@ const theme = {
 
 const { width: viewportWidth } = Dimensions.get('window');
 
+const STATES = [
+  { label: 'Rio de Janeiro', value: 'RJ' },
+  { label: 'São Paulo', value: 'SP' },
+  // Add other states here
+];
+
+const CITIES_RJ = [
+  'Rio de Janeiro',
+  'Niterói',
+  'Petrópolis',
+  // Add other cities in Rio de Janeiro here
+];
+
+const COLLEGES_RJ = [
+  'Universidade Federal do Rio de Janeiro (UFRJ)',
+  'Universidade do Estado do Rio de Janeiro (UERJ)',
+  // Add other public universities in Rio de Janeiro here
+];
+
 function CreateHouseScreen() {
   const navigation = useNavigation();
   const [id, setId] = React.useState('');
   const [propertyType, setPropertyType] = React.useState('');
   const [price, setPrice] = React.useState('');
+  const [state, setState] = React.useState('');
   const [city, setCity] = React.useState('');
   const [neighborhood, setNeighborhood] = React.useState('');
   const [nearbyCollege, setNearbyCollege] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [images, setImages] = React.useState([]);
-  const [menuVisible, setMenuVisible] = React.useState(false);
+  const [propertyTypeMenuVisible, setPropertyTypeMenuVisible] = React.useState(false);
+  const [stateMenuVisible, setStateMenuVisible] = React.useState(false);
+  const [cityMenuVisible, setCityMenuVisible] = React.useState(false);
+  const [collegeMenuVisible, setCollegeMenuVisible] = React.useState(false);
   const params = useLocalSearchParams();
 
   const [errors, setErrors] = React.useState({
     propertyType: false,
     price: false,
+    state: false,
     city: false,
     neighborhood: false,
     nearbyCollege: false,
     description: false,
   });
 
-  // React.useEffect(() => {
-  //   const loadImages = async () => {
-  //     const savedImages = await AsyncStorage.getItem('uploadedImages');
-  //     if (savedImages) {
-  //       setImages(JSON.parse(savedImages));
-  //     }
-  //   };
-  //   loadImages();
-  // }, []);
-
   React.useEffect(() => {
-
     const fetchUserAnnouncements = async () => {
       const houses = await localStorageService.getAllItems('houses', params.id);
       const house = houses.filter((house) => house.id == params.id);
 
-      setId(params.id)
+      setId(params.id);
       setPropertyType(house[0].propertyType);
       setPrice(house[0].price);
+      setState(house[0].state);
       setCity(house[0].city);
       setNeighborhood(house[0].neighborhood);
       setNearbyCollege(house[0].nearbyCollege);
       setDescription(house[0].description);
       setImages(house[0].images);
-
-    }
+    };
 
     if (params.id) {
-      fetchUserAnnouncements()
+      fetchUserAnnouncements();
     }
-  }, [])
+  }, [params.id]);
 
   const handleImageUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -135,6 +147,7 @@ function CreateHouseScreen() {
     const newErrors = {
       propertyType: !propertyType,
       price: !price,
+      state: !state,
       city: !city,
       neighborhood: !neighborhood,
       nearbyCollege: !nearbyCollege,
@@ -157,6 +170,7 @@ function CreateHouseScreen() {
         id: id ? id : Date.now(),
         propertyType,
         price,
+        state,
         city,
         neighborhood,
         nearbyCollege,
@@ -166,14 +180,11 @@ function CreateHouseScreen() {
       };
 
       if (id === '') {
-
         await localStorageService.saveItem('houses', house);
         Alert.alert("Sucesso", "Imóvel adicionado com sucesso");
-
       } else {
         Alert.alert("Sucesso", "Imóvel atualizado com sucesso");
         await localStorageService.updateItem('houses', house.id, house);
-
       }
       setTimeout(() => {
         navigation.goBack();
@@ -213,19 +224,19 @@ function CreateHouseScreen() {
         <ScrollView>
           <View style={{ borderWidth: 1, borderColor: errors.propertyType ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
             <Menu
-              visible={menuVisible}
-              onDismiss={() => setMenuVisible(false)}
+              visible={propertyTypeMenuVisible}
+              onDismiss={() => setPropertyTypeMenuVisible(false)}
               anchor={
-                <TouchableOpacity onPress={() => setMenuVisible(true)} style={styles.menuButton}>
+                <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
                   <Text style={styles.menuText}>{propertyType || 'Selecione o tipo de imóvel'}</Text>
                   <Icon name="arrow-drop-down" size={24} color="#000" />
                 </TouchableOpacity>
               }
             >
-              <Menu.Item onPress={() => { setPropertyType('Casa'); setMenuVisible(false); }} title="Casa" />
-              <Menu.Item onPress={() => { setPropertyType('Kitnet'); setMenuVisible(false); }} title="Kitnet" />
-              <Menu.Item onPress={() => { setPropertyType('Apartamento'); setMenuVisible(false); }} title="Apartamento" />
-              <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setMenuVisible(false); }} title="Imóvel Compartilhado" />
+              <Menu.Item onPress={() => { setPropertyType('Casa'); setPropertyTypeMenuVisible(false); }} title="Casa" />
+              <Menu.Item onPress={() => { setPropertyType('Kitnet'); setPropertyTypeMenuVisible(false); }} title="Kitnet" />
+              <Menu.Item onPress={() => { setPropertyType('Apartamento'); setPropertyTypeMenuVisible(false); }} title="Apartamento" />
+              <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setPropertyTypeMenuVisible(false); }} title="Imóvel Compartilhado" />
             </Menu>
           </View>
           {errors.propertyType && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
@@ -240,14 +251,63 @@ function CreateHouseScreen() {
           />
           {errors.price && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
-          <TextInput
-            label="Cidade"
-            value={city}
-            onChangeText={text => setCity(text)}
-            style={[styles.input, errors.city && styles.errorInput]}
-            mode="outlined"
-          />
-          {errors.city && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+          <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
+            <Menu
+              visible={stateMenuVisible}
+              onDismiss={() => setStateMenuVisible(false)}
+              anchor={
+                <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
+                  <Text style={styles.menuText}>{state || 'Selecione o estado'}</Text>
+                  <Icon name="arrow-drop-down" size={24} color="#000" />
+                </TouchableOpacity>
+              }
+            >
+              {STATES.map((state, index) => (
+                <Menu.Item key={index} onPress={() => { setState(state.value); setStateMenuVisible(false); }} title={state.label} />
+              ))}
+            </Menu>
+          </View>
+          {errors.state && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+
+          {state === 'RJ' && (
+            <>
+              <View style={{ borderWidth: 1, borderColor: errors.city ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
+                <Menu
+                  visible={cityMenuVisible}
+                  onDismiss={() => setCityMenuVisible(false)}
+                  anchor={
+                    <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{city || 'Selecione a cidade'}</Text>
+                      <Icon name="arrow-drop-down" size={24} color="#000" />
+                    </TouchableOpacity>
+                  }
+                >
+                  {CITIES_RJ.map((city, index) => (
+                    <Menu.Item key={index} onPress={() => { setCity(city); setCityMenuVisible(false); }} title={city} />
+                  ))}
+                </Menu>
+              </View>
+              {errors.city && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+
+              <View style={{ borderWidth: 1, borderColor: errors.nearbyCollege ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
+                <Menu
+                  visible={collegeMenuVisible}
+                  onDismiss={() => setCollegeMenuVisible(false)}
+                  anchor={
+                    <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{nearbyCollege || 'Selecione a faculdade próxima'}</Text>
+                      <Icon name="arrow-drop-down" size={24} color="#000" />
+                    </TouchableOpacity>
+                  }
+                >
+                  {COLLEGES_RJ.map((college, index) => (
+                    <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
+                  ))}
+                </Menu>
+              </View>
+              {errors.nearbyCollege && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+            </>
+          )}
 
           <TextInput
             label="Bairro"
@@ -257,15 +317,6 @@ function CreateHouseScreen() {
             mode="outlined"
           />
           {errors.neighborhood && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
-
-          <TextInput
-            label="Faculdade Próxima"
-            value={nearbyCollege}
-            onChangeText={text => setNearbyCollege(text)}
-            style={[styles.input, errors.nearbyCollege && styles.errorInput]}
-            mode="outlined"
-          />
-          {errors.nearbyCollege && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
           <TextInput
             label="Descrição"

@@ -88,7 +88,7 @@ function AnnouncementsScreen() {
         (!filterCriteria.city || announcement.city === filterCriteria.city) &&
         (!filterCriteria.neighborhood || announcement.neighborhood === filterCriteria.neighborhood) &&
         (!filterCriteria.nearbyCollege || announcement.nearbyCollege === filterCriteria.nearbyCollege) &&
-        (Math.abs(announcement.price - filterCriteria.price) <= 1000)
+        (announcement.price <= filterCriteria.price)
       );
     });
 
@@ -154,11 +154,8 @@ function AnnouncementsScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackIcon}>
-            <Icon name="arrow-left" size={24} color="#1D3D4C" />
-          </TouchableOpacity>
           <View style={styles.searchInputContainer}>
-            <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
+            {/* <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
             <TextInput
               placeholder="Pesquise por acomodações"
               placeholderTextColor="#aaaaaa"
@@ -166,7 +163,7 @@ function AnnouncementsScreen() {
               onChangeText={text => setSearch(text)}
               onSubmitEditing={() => handleSearchSubmit()}
               style={styles.searchInput}
-            />
+            /> */}
             <TouchableOpacity onPress={openFilterModal}>
               <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
             </TouchableOpacity>
@@ -228,7 +225,7 @@ function AnnouncementsScreen() {
                   style={{ width: '100%', height: 40 }}
                   minimumValue={0}
                   maximumValue={100000}
-                  step={1000}
+                  step={100}
                   value={sliderValue}
                   onValueChange={setSliderValue}
                   minimumTrackTintColor="#2457C5"

@@ -49,7 +49,6 @@ function ChangePasswordScreen() {
 
       user.password = newPassword;
 
-      console.log(user.password);
       
       localStorageService.updateUserItem('users', user.email, user);
 

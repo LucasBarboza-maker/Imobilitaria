@@ -44,6 +44,44 @@ function DetailScreen() {
       return;
     }
 
+    const removeOrAddAnnouncement = async () => {
+      const houses = await localStorageService.getAllItems('houses');
+      const house = houses.find(house => house.id === id);
+  
+      if (storedUser) {
+        const users = await localStorageService.getAllItems('users');
+        const user = users.find(user => user.email === storedUser.email);
+  
+        if (house.favoriteUsers) {
+          if (checarFavorito(house) === 'red') {
+            house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email !== storedUser.email);
+          } else {
+            house.favoriteUsers.push(user);
+          }
+        } else {
+          house.favoriteUsers = [];
+          house.favoriteUsers.push(user);
+        }
+  
+        localStorageService.updateItem('houses', house.id, house);
+      }
+      fetchFavoriteAnnouncements();
+      hideModal();
+    };
+
+
+      function checarFavorito(announcement) {
+    let favoriteUser = [];
+    if (announcement.favoriteUsers) {
+      favoriteUser = announcement.favoriteUsers.filter(fav => fav.email === storedUser.email);
+      if (favoriteUser.length > 0) {
+        return "red";
+      }
+    }
+    return "gray";
+  }
+  
+
     const newCommentWithUser = {
       ...comment,
       name: loggedUser[0].name,
@@ -95,10 +133,10 @@ function DetailScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ExpoStatusBar style="auto" />
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <MaterialIcons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Voltar</Text>
+          </TouchableOpacity> */}
+          {/* <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Voltar</Text> */}
         </View>
         <ImageBackground
           source={{ uri: house.images[0] }}

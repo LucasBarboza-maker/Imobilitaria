@@ -30,7 +30,7 @@ function Settings() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('profile')}>
               <Icon name="account" size={20} color="#fff" style={styles.icon} />
-              <Text style={styles.buttonText}>Dados Pessoais</Text>
+              <Text style={styles.buttonText}>Editar Dados Pessoais</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('change-password-settings')}>
               <Icon name="lock" size={20} color="#fff" style={styles.icon} />

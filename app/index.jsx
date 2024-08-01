@@ -42,7 +42,7 @@ function LoginScreen() {
     try {
       const users = await localStorageService.getAllItems('users');
       const user = users.find(user => user.email === username && user.password === password);
-      console.log(user)
+    
       if (user) {
         if (true) {
           // await AsyncStorage.setItem('logged', JSON.stringify({ email: username, password }));
@@ -50,7 +50,6 @@ function LoginScreen() {
         } else {
           await AsyncStorage.removeItem('logged');
         }
-        console.log(await localStorageService.getAllItems('logged'))
         navigation.navigate('main/(tabs)');
       } else {
         Alert.alert('Erro', 'Email ou senha incorretos');

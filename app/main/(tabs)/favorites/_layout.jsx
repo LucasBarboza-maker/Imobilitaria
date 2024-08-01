@@ -76,13 +76,13 @@ function FavoritesScreen() {
     };
 
     const filtered = announcements.filter((announcement) => {
-      const isWithinPriceRange = Math.abs(announcement.price - filterCriteria.price) <= 1000;
+      
       return (
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
         (!filterCriteria.city || announcement.city.toLowerCase() === filterCriteria.city.toLowerCase()) &&
         (!filterCriteria.neighborhood || announcement.neighborhood.toLowerCase() === filterCriteria.neighborhood.toLowerCase()) &&
         (!filterCriteria.nearbyCollege || announcement.nearbyCollege.toLowerCase() === filterCriteria.nearbyCollege.toLowerCase()) &&
-        isWithinPriceRange
+        (announcement.price <= filterCriteria.price)
       );
     });
 
@@ -135,11 +135,8 @@ function FavoritesScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.goBackIcon}>
-            <Icon name="arrow-left" size={24} color="#1D3D4C" />
-          </TouchableOpacity>
           <View style={styles.searchInputContainer}>
-            <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
+            {/* <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
             <TextInput
               placeholder="Pesquise por acomodações"
               placeholderTextColor="#aaaaaa"
@@ -147,7 +144,7 @@ function FavoritesScreen() {
               onChangeText={text => setSearch(text)}
               onSubmitEditing={handleSearchSubmit}
               style={styles.searchInput}
-            />
+            /> */}
             <TouchableOpacity onPress={() => setFilterVisible(true)}>
               <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
             </TouchableOpacity>
@@ -209,7 +206,7 @@ function FavoritesScreen() {
                   style={{ width: '100%', height: 40 }}
                   minimumValue={0}
                   maximumValue={100000}
-                  step={1000}
+                  step={100}
                   value={sliderValue}
                   onValueChange={setSliderValue}
                   minimumTrackTintColor="#2457C5"
