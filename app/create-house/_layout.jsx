@@ -357,6 +357,7 @@ function CreateHouseScreen() {
                 <Menu
                   visible={propertyTypeMenuVisible}
                   onDismiss={() => setPropertyTypeMenuVisible(false)}
+                  style={{position:'relative',  width:'70%', top:'25%'}}
                   anchor={
                     <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
                       <Text style={styles.menuText}>{propertyType || 'Selecione o tipo de imóvel'}</Text>
@@ -378,13 +379,14 @@ function CreateHouseScreen() {
                 onChangeText={text => setPrice(text)}
                 style={[styles.input, errors.price && styles.errorInput]}
                 keyboardType="numeric"
-                mode="outlined"
+                mode="flat"
               />
               {errors.price && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
               <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                 <Menu
                   visible={stateMenuVisible}
+                  style={{position:'relative', top:'42%',  width:'70%'}}
                   onDismiss={() => setStateMenuVisible(false)}
                   anchor={
                     <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
@@ -405,6 +407,7 @@ function CreateHouseScreen() {
                   <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                     <Menu
                       visible={cityMenuVisible}
+                      style={{position:'relative',  width:'70%', top:'50%'}}
                       onDismiss={() => setCityMenuVisible(false)}
                       anchor={
                         <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
@@ -424,6 +427,7 @@ function CreateHouseScreen() {
                   <Menu
                       visible={collegeMenuVisible}
                       onDismiss={() => setCollegeMenuVisible(false)}
+                      style={{position:'relative',  width:'70%', top:'58%'}}
                       anchor={
                         <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
                           <Text style={styles.menuText}>{nearbyCollege || 'Selecione a faculdade próxima'}</Text>
@@ -445,7 +449,7 @@ function CreateHouseScreen() {
                 value={neighborhood}
                 onChangeText={text => setNeighborhood(text)}
                 style={[styles.input, errors.neighborhood && styles.errorInput]}
-                mode="outlined"
+                mode="flat"
               />
               {errors.neighborhood && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
@@ -455,7 +459,7 @@ function CreateHouseScreen() {
                 onChangeText={text => setDescription(text)}
                 style={[styles.input, styles.descriptionInput, errors.description && styles.errorInput]}
                 multiline
-                mode="outlined"
+                mode="flat"
               />
               {errors.description && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
