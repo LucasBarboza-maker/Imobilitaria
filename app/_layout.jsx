@@ -42,6 +42,9 @@ function RootLayout() {
           name="change-password-settings-from-login"
           options={{ title: 'Change Password Settings Screen', headerShown: false }} />
         <Stack.Screen
+          name="chat"
+          options={{ title: 'Chat Screen', headerShown: false }} />
+        <Stack.Screen
           name="help"
           options={{ title: 'Help Screen', headerShown: false }} />
       </Stack>

@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
-import { TextInput, Button } from 'react-native-paper';
+import * as React from 'react';
+import { Image, ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Checkbox, DefaultTheme, Modal, Provider as PaperProvider, Portal, TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import localStorageService from '../service/localStorageService';
 
@@ -16,6 +16,8 @@ function RegisterScreen() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [passwordStrength, setPasswordStrength] = React.useState(0);
   const [strengthLegend, setStrengthLegend] = React.useState('');
+  const [termsAccepted, setTermsAccepted] = React.useState(false);
+  const [termsVisible, setTermsVisible] = React.useState(false); // State for modal visibility
 
   const inputTheme = {
     colors: {
@@ -24,19 +26,27 @@ function RegisterScreen() {
     },
   };
 
+  // Create a custom theme
+const theme = {
+  ...DefaultTheme,
+  roundness: 2,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#2457C5',
+  },
+};
+
   const calculatePasswordStrength = (password) => {
     let strength = 0;
     if (password.length >= 8) strength += 25;
     if (/[A-Z]/.test(password)) strength += 25;
     if (/[0-9]/.test(password)) strength += 25;
     if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-    
-    if(strength == 0) setStrengthLegend("Fraca: utilize letras maisuculas e caracteres especiais");
-    if(strength == 25) setStrengthLegend("Fraca: utilize letras maisuculas e caracteres especiais");
-    if(strength == 50) setStrengthLegend("Media: utilize letras maisuculas e caracteres especiais");
-    if(strength == 100) setStrengthLegend("Forte");
 
-    console.log(strength);
+    if (strength == 0) setStrengthLegend("Fraca: utilize letras maiúsculas e caracteres especiais");
+    if (strength == 25) setStrengthLegend("Fraca: utilize letras maiúsculas e caracteres especiais");
+    if (strength == 50) setStrengthLegend("Média: utilize letras maiúsculas e caracteres especiais");
+    if (strength == 100) setStrengthLegend("Forte");
 
     return strength;
   };
@@ -47,6 +57,11 @@ function RegisterScreen() {
   };
 
   const handleRegister = async () => {
+    if (!termsAccepted) {
+      alert('Você deve aceitar os Termos de Serviço para registrar-se.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       alert('As senhas não coincidem');
       return;
@@ -78,88 +93,114 @@ function RegisterScreen() {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/images/login_bg_image.png')}
-      style={styles.backgroundImage}
-    >
-      <View style={styles.container}>
-        <Image
-          source={require('../../assets/images/logo.png')}
-          style={styles.logo}
-        />
-        <Text style={styles.text}>Registrar</Text>
-        <TextInput
-          label="Nome"
-          value={name}
-          onChangeText={text => setName(text)}
-          style={styles.input}
-          theme={inputTheme}
-        />
-        <TextInput
-          label="Sobrenome"
-          value={surname}
-          onChangeText={text => setSurname(text)}
-          style={styles.input}
-          theme={inputTheme}
-        />
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={text => setEmail(text)}
-          style={styles.input}
-          theme={inputTheme}
-        />
-        <TextInput
-          label="Telefone"
-          value={phone}
-          onChangeText={text => setPhone(text)}
-          style={styles.input}
-          theme={inputTheme}
-        />
-        <View style={styles.passwordContainer}>
+    <PaperProvider theme={theme}>
+
+      <ImageBackground
+        source={require('../../assets/images/login_bg_image.png')}
+        style={styles.backgroundImage}
+      >
+        <View style={styles.container}>
+          <Image
+            source={require('../../assets/images/logo.png')}
+            style={styles.logo}
+          />
+          <Text style={styles.text}>Registrar</Text>
           <TextInput
-            label="Senha"
-            value={password}
-            onChangeText={text => handlePasswordChange(text)}
-            secureTextEntry={!showPassword}
-            style={[styles.input, { flex: 1, marginBottom: 8 }]}
+            label="Nome"
+            value={name}
+            onChangeText={text => setName(text)}
+            style={styles.input}
             theme={inputTheme}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-            <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
+          <TextInput
+            label="Sobrenome"
+            value={surname}
+            onChangeText={text => setSurname(text)}
+            style={styles.input}
+            theme={inputTheme}
+          />
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={text => setEmail(text)}
+            style={styles.input}
+            theme={inputTheme}
+          />
+          <TextInput
+            label="Telefone"
+            value={phone}
+            onChangeText={text => setPhone(text)}
+            style={styles.input}
+            theme={inputTheme}
+          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              label="Senha"
+              value={password}
+              onChangeText={text => handlePasswordChange(text)}
+              secureTextEntry={!showPassword}
+              style={[styles.input, { flex: 1, marginBottom: 8 }]}
+              theme={inputTheme}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
+            </TouchableOpacity>
+          </View>
+          <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', justifyContent: 'space-between', height: 16 }}>
+            {passwordStrength >= 25 ? <View style={{ width: '23%', height: 8, backgroundColor: 'red' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
+            {passwordStrength >= 50 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
+            {passwordStrength >= 75 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
+            {passwordStrength == 100 ? <View style={{ width: '23%', height: 8, backgroundColor: 'green' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
+          </View>
+          <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', justifyContent: 'space-between', height: 16, marginBottom: 16 }}>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16, width: '100%' }}>
+              {strengthLegend}
+            </Text>
+          </View>
+          <TextInput
+            label="Confirmar Senha"
+            value={confirmPassword}
+            onChangeText={text => setConfirmPassword(text)}
+            secureTextEntry
+            style={styles.input}
+            theme={inputTheme}
+          />
+          <View style={styles.termsContainer}>
+            <Checkbox
+              status={termsAccepted ? 'checked' : 'unchecked'}
+              onPress={() => setTermsAccepted(!termsAccepted)}
+              color="#4A90E2"
+            />
+            <TouchableOpacity onPress={() => setTermsVisible(true)}>
+              <Text style={[styles.termsText, { textDecorationLine: 'underline' }]}>Eu aceito os Termos de Serviço</Text>
+            </TouchableOpacity>
+          </View>
+          <Button
+            mode="contained"
+            onPress={handleRegister}
+            style={styles.button}
+          >
+            Registrar
+          </Button>
+          <TouchableOpacity onPress={() => navigation.navigate('login')}>
+            <Text style={styles.loginText}>Já tem uma conta? Acesse</Text>
           </TouchableOpacity>
+
+          <Portal>
+            <Modal visible={termsVisible} onDismiss={() => setTermsVisible(false)} contentContainerStyle={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Termos de Serviço</Text>
+              <ScrollView>
+                <Text style={styles.modalContent}>
+                Estes são os Termos de Serviço do nosso aplicativo de aluguel de casas. Ao aceitar estes termos, você concorda em seguir as regras e regulamentos estabelecidos por este aplicativo. Por favor, leia cuidadosamente todos os termos e condições antes de aceitar. A aceitação destes termos é necessária para registrar-se e utilizar os serviços do nosso aplicativo de aluguel de casas.                </Text>
+              </ScrollView>
+              <Button onPress={() => setTermsVisible(false)} style={styles.closeButton}>Fechar</Button>
+            </Modal>
+          </Portal>
         </View>
-        <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', justifyContent: 'space-between', height: 16 }}>
-          {passwordStrength >= 25 ? <View style={{ width: '23%', height: 8, backgroundColor: 'red' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-          {passwordStrength >= 50 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-          {passwordStrength >= 75 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-          {passwordStrength == 100 ? <View style={{ width: '23%', height: 8, backgroundColor: 'green' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-        </View>
-        <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', justifyContent: 'space-between', height: 16, marginBottom: 16 }}>
-          <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16, width: '100%' }}>
-            {strengthLegend}
-          </Text>
-        </View>
-        <TextInput
-          label="Confirmar Senha"
-          value={confirmPassword}
-          onChangeText={text => setConfirmPassword(text)}
-          secureTextEntry
-          style={styles.input}
-          theme={inputTheme}
-        />
-        <Button
-          mode="contained"
-          onPress={handleRegister}
-          style={styles.button}
-        >
-          Registrar
-        </Button>
-        <TouchableOpacity onPress={() => navigation.navigate('login')}>
-          <Text style={styles.loginText}>Já tem uma conta? Acesse</Text>
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+
+    </PaperProvider>
+
   );
 }
 
@@ -222,6 +263,33 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 16,
     textDecorationLine: 'underline',
+  },
+  termsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  termsText: {
+    color: 'white',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 20,
+    borderRadius: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  modalContent: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  closeButton: {
+    alignSelf: 'center',
+    marginTop: 16,
   },
 });
 

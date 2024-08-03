@@ -47,11 +47,11 @@ function DetailScreen() {
     const removeOrAddAnnouncement = async () => {
       const houses = await localStorageService.getAllItems('houses');
       const house = houses.find(house => house.id === id);
-  
+
       if (storedUser) {
         const users = await localStorageService.getAllItems('users');
         const user = users.find(user => user.email === storedUser.email);
-  
+
         if (house.favoriteUsers) {
           if (checarFavorito(house) === 'red') {
             house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email !== storedUser.email);
@@ -62,7 +62,7 @@ function DetailScreen() {
           house.favoriteUsers = [];
           house.favoriteUsers.push(user);
         }
-  
+
         localStorageService.updateItem('houses', house.id, house);
       }
       fetchFavoriteAnnouncements();
@@ -70,17 +70,17 @@ function DetailScreen() {
     };
 
 
-      function checarFavorito(announcement) {
-    let favoriteUser = [];
-    if (announcement.favoriteUsers) {
-      favoriteUser = announcement.favoriteUsers.filter(fav => fav.email === storedUser.email);
-      if (favoriteUser.length > 0) {
-        return "red";
+    function checarFavorito(announcement) {
+      let favoriteUser = [];
+      if (announcement.favoriteUsers) {
+        favoriteUser = announcement.favoriteUsers.filter(fav => fav.email === storedUser.email);
+        if (favoriteUser.length > 0) {
+          return "red";
+        }
       }
+      return "gray";
     }
-    return "gray";
-  }
-  
+
 
     const newCommentWithUser = {
       ...comment,
@@ -203,6 +203,13 @@ function DetailScreen() {
             </Button>
           </Modal>
         </Portal>
+        <TouchableOpacity
+          style={styles.chatButton}
+          onPress={() => navigation.navigate('chat')}
+        >
+          <MaterialIcons name="chat" size={24} color="white" />
+          <Text style={styles.chatButtonText}>Chat</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     </PaperProvider>
   );
@@ -295,6 +302,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginBottom: 16,
+  },
+  chatButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#2457C5',
+    borderRadius: 50,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  chatButtonText: {
+    color: 'white',
+    marginLeft: 10,
+    fontWeight: 'bold',
   },
 });
 
