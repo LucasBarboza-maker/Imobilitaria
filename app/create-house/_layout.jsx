@@ -357,7 +357,7 @@ function CreateHouseScreen() {
                 <Menu
                   visible={propertyTypeMenuVisible}
                   onDismiss={() => setPropertyTypeMenuVisible(false)}
-                  style={{position:'relative',  width:'70%', top:'25%'}}
+                  style={{position:'relative',  width:'70%', top:210}}
                   anchor={
                     <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
                       <Text style={styles.menuText}>{propertyType || 'Selecione o tipo de imóvel'}</Text>
@@ -386,7 +386,7 @@ function CreateHouseScreen() {
               <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                 <Menu
                   visible={stateMenuVisible}
-                  style={{position:'relative', top:'42%',  width:'70%'}}
+                  style={{position:'relative', top:350,  width:'70%'}}
                   onDismiss={() => setStateMenuVisible(false)}
                   anchor={
                     <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
@@ -407,7 +407,7 @@ function CreateHouseScreen() {
                   <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                     <Menu
                       visible={cityMenuVisible}
-                      style={{position:'relative',  width:'70%', top:'50%'}}
+                      style={{position:'relative',  width:'70%', top:410}}
                       onDismiss={() => setCityMenuVisible(false)}
                       anchor={
                         <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
@@ -427,7 +427,7 @@ function CreateHouseScreen() {
                   <Menu
                       visible={collegeMenuVisible}
                       onDismiss={() => setCollegeMenuVisible(false)}
-                      style={{position:'relative',  width:'70%', top:'58%'}}
+                      style={{position:'relative',  width:'70%', top:480}}
                       anchor={
                         <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
                           <Text style={styles.menuText}>{nearbyCollege || 'Selecione a faculdade próxima'}</Text>
