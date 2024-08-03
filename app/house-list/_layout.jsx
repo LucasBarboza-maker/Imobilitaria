@@ -9,7 +9,6 @@ import Slider from '@react-native-community/slider';
 import localStorageService from '../service/localStorageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Create a custom theme
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -19,6 +18,25 @@ const theme = {
   },
 };
 
+const STATES = [
+  { label: 'Rio de Janeiro', value: 'RJ' },
+  { label: 'São Paulo', value: 'SP' },
+  // Add other states here
+];
+
+const CITIES_RJ = [
+  'Rio de Janeiro',
+  'Niterói',
+  'Petrópolis',
+  // Add other cities in Rio de Janeiro here
+];
+
+const COLLEGES_RJ = [
+  'Universidade Federal do Rio de Janeiro (UFRJ)',
+  'Universidade do Estado do Rio de Janeiro (UERJ)',
+  // Add other public universities in Rio de Janeiro here
+];
+
 function AnnouncementsScreen() {
   const navigation = useNavigation();
   const params = useLocalSearchParams();
@@ -26,10 +44,14 @@ function AnnouncementsScreen() {
   const [search, setSearch] = React.useState(searchQuery || '');
   const [filterVisible, setFilterVisible] = React.useState(false);
   const [propertyType, setPropertyType] = React.useState('');
+  const [state, setState] = React.useState('');
   const [city, setCity] = React.useState('');
   const [neighborhood, setNeighborhood] = React.useState('');
   const [nearbyCollege, setNearbyCollege] = React.useState('');
-  const [menuVisible, setMenuVisible] = React.useState(false);
+  const [propertyTypeMenuVisible, setPropertyTypeMenuVisible] = React.useState(false);
+  const [stateMenuVisible, setStateMenuVisible] = React.useState(false);
+  const [cityMenuVisible, setCityMenuVisible] = React.useState(false);
+  const [collegeMenuVisible, setCollegeMenuVisible] = React.useState(false);
   const [sliderValue, setSliderValue] = React.useState(50000);
   const [announcements, setAnnouncements] = React.useState([]);
   const [visible, setVisible] = React.useState(false);
@@ -76,6 +98,7 @@ function AnnouncementsScreen() {
     const houses = await localStorageService.getAllItems('houses');
     const filterCriteria = {
       propertyType,
+      state,
       city,
       neighborhood,
       nearbyCollege,
@@ -85,6 +108,7 @@ function AnnouncementsScreen() {
     const filteredAnnouncements = houses.filter((announcement) => {
       return (
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
+        (!filterCriteria.state || announcement.state === filterCriteria.state) &&
         (!filterCriteria.city || announcement.city === filterCriteria.city) &&
         (!filterCriteria.neighborhood || announcement.neighborhood === filterCriteria.neighborhood) &&
         (!filterCriteria.nearbyCollege || announcement.nearbyCollege === filterCriteria.nearbyCollege) &&
@@ -98,6 +122,7 @@ function AnnouncementsScreen() {
 
   const resetFilters = () => {
     setPropertyType('');
+    setState('');
     setCity('');
     setNeighborhood('');
     setNearbyCollege('');
@@ -155,15 +180,6 @@ function AnnouncementsScreen() {
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
           <View style={styles.searchInputContainer}>
-            {/* <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
-            <TextInput
-              placeholder="Pesquise por acomodações"
-              placeholderTextColor="#aaaaaa"
-              value={search}
-              onChangeText={text => setSearch(text)}
-              onSubmitEditing={() => handleSearchSubmit()}
-              style={styles.searchInput}
-            /> */}
             <TouchableOpacity onPress={openFilterModal}>
               <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
             </TouchableOpacity>
@@ -197,34 +213,89 @@ function AnnouncementsScreen() {
           <Modal visible={filterVisible} onDismiss={() => setFilterVisible(false)} contentContainerStyle={styles.modalContainer}>
             <ScrollView>
               <Text style={styles.modalTitle}>Filtrar Imóveis</Text>
-              <View style={styles.dropdownContainer}>
+              <View style={[styles.dropdownContainer, styles.input]}>
                 <Menu
-                  visible={menuVisible}
-                  onDismiss={() => setMenuVisible(false)}
+                  visible={propertyTypeMenuVisible}
+                  onDismiss={() => setPropertyTypeMenuVisible(false)}
                   anchor={
-                    <TouchableOpacity onPress={() => setMenuVisible(true)}>
-                      <TextInput
-                        label="Tipo de Imóvel"
-                        value={propertyType}
-                        style={styles.input}
-                        editable={false}
-                        right={<TextInput.Icon name="menu-down" />}
-                      />
+                    <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{propertyType || 'Tipo de Imóvel'}</Text>
+                      <Icon name="menu-down" size={24} color="#000" />
                     </TouchableOpacity>
                   }
+                  contentStyle={styles.dropdownMenu}
                 >
-                  <Menu.Item onPress={() => { setPropertyType('Casa'); setMenuVisible(false); }} title="Casa" />
-                  <Menu.Item onPress={() => { setPropertyType('Kitnet'); setMenuVisible(false); }} title="Kitnet" />
-                  <Menu.Item onPress={() => { setPropertyType('Apartamento'); setMenuVisible(false); }} title="Apartamento" />
-                  <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setMenuVisible(false); }} title="Imóvel Compartilhado" />
+                  <Menu.Item onPress={() => { setPropertyType('Casa'); setPropertyTypeMenuVisible(false); }} title="Casa" />
+                  <Menu.Item onPress={() => { setPropertyType('Kitnet'); setPropertyTypeMenuVisible(false); }} title="Kitnet" />
+                  <Menu.Item onPress={() => { setPropertyType('Apartamento'); setPropertyTypeMenuVisible(false); }} title="Apartamento" />
+                  <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setPropertyTypeMenuVisible(false); }} title="Imóvel Compartilhado" />
                 </Menu>
               </View>
+
+              <View style={[styles.dropdownContainer, styles.input]}>
+                <Menu
+                  visible={stateMenuVisible}
+                  onDismiss={() => setStateMenuVisible(false)}
+                  anchor={
+                    <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{state || 'Selecione o Estado'}</Text>
+                      <Icon name="menu-down" size={24} color="#000" />
+                    </TouchableOpacity>
+                  }
+                  contentStyle={styles.dropdownMenu}
+                >
+                  {STATES.map((state, index) => (
+                    <Menu.Item key={index} onPress={() => { setState(state.value); setStateMenuVisible(false); }} title={state.label} />
+                  ))}
+                </Menu>
+              </View>
+
+              {state === 'RJ' && (
+                <>
+                  <View style={[styles.dropdownContainer, styles.input]}>
+                    <Menu
+                      visible={cityMenuVisible}
+                      onDismiss={() => setCityMenuVisible(false)}
+                      anchor={
+                        <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
+                          <Text style={styles.menuText}>{city || 'Selecione a Cidade'}</Text>
+                          <Icon name="menu-down" size={24} color="#000" />
+                        </TouchableOpacity>
+                      }
+                      contentStyle={styles.dropdownMenu}
+                    >
+                      {CITIES_RJ.map((city, index) => (
+                        <Menu.Item key={index} onPress={() => { setCity(city); setCityMenuVisible(false); }} title={city} />
+                      ))}
+                    </Menu>
+                  </View>
+
+                  <View style={[styles.dropdownContainer, styles.input]}>
+                    <Menu
+                      visible={collegeMenuVisible}
+                      onDismiss={() => setCollegeMenuVisible(false)}
+                      anchor={
+                        <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
+                          <Text style={styles.menuText}>{nearbyCollege || 'Selecione a Faculdade Próxima'}</Text>
+                          <Icon name="menu-down" size={24} color="#000" />
+                        </TouchableOpacity>
+                      }
+                      contentStyle={styles.dropdownMenu}
+                    >
+                      {COLLEGES_RJ.map((college, index) => (
+                        <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
+                      ))}
+                    </Menu>
+                  </View>
+                </>
+              )}
+
               <View style={styles.sliderContainer}>
                 <Text>Valor do Imóvel: R$ {sliderValue}</Text>
                 <Slider
                   style={{ width: '100%', height: 40 }}
                   minimumValue={0}
-                  maximumValue={100000}
+                  maximumValue={10000}
                   step={100}
                   value={sliderValue}
                   onValueChange={setSliderValue}
@@ -232,24 +303,6 @@ function AnnouncementsScreen() {
                   maximumTrackTintColor="#000000"
                 />
               </View>
-              <TextInput
-                label="Cidade"
-                value={city}
-                onChangeText={text => setCity(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="Bairro"
-                value={neighborhood}
-                onChangeText={text => setNeighborhood(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="Faculdade Próxima"
-                value={nearbyCollege}
-                onChangeText={text => setNearbyCollege(text)}
-                style={styles.input}
-              />
               <Button mode="contained" onPress={applyFilters} style={styles.button}>
                 Aplicar Filtros
               </Button>
@@ -369,7 +422,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     margin: 20,
-    borderRadius: 10,
+    borderRadius: 10
   },
   modalTitle: {
     fontSize: 20,
@@ -403,6 +456,30 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     marginHorizontal: 10,
+  },
+  menuButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+  },
+  menuText: {
+    flex: 1,
+    fontSize: 16,
+  },
+  dropdownContainer: {
+    marginBottom: 16,
+  },
+  dropdownMenu: {
+    backgroundColor: '#fff',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 16,
+    marginTop: 0,
   },
 });
 

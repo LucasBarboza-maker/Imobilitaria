@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, Alert, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, StatusBar, SafeAreaView, Platform, Alert, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Menu, TextInput } from 'react-native-paper';

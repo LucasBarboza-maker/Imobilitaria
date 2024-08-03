@@ -205,7 +205,7 @@ function FavoritesScreen() {
                 <Slider
                   style={{ width: '100%', height: 40 }}
                   minimumValue={0}
-                  maximumValue={100000}
+                  maximumValue={10000}
                   step={100}
                   value={sliderValue}
                   onValueChange={setSliderValue}
