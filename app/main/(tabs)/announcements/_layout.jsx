@@ -59,6 +59,7 @@ function UserAnnouncementsScreen() {
                   onPress={() => navigation.navigate('house-details', { houseId: announcement.id })}
                 >
                   <AnnouncementCard
+                    nearbyCollege={announcement.nearbyCollege}
                     title={announcement.city}
                     value={announcement.price}
                     description={announcement.description}

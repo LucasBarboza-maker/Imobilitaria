@@ -4,6 +4,7 @@ import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { DefaultTheme, Provider as PaperProvider, Button, Modal, Portal } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import CommentCard from '../../components/CommentCard';
 import localStorageService from '../service/localStorageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,6 +31,8 @@ function DetailScreen() {
   const [isFavorite, setIsFavorite] = React.useState(false);
   const [favoriteModalVisible, setFavoriteModalVisible] = React.useState(false);
   const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useState('adicionar');
+  const [deleteModalVisible, setDeleteModalVisible] = React.useState(false);
+  const [commentToDelete, setCommentToDelete] = React.useState(null);
 
   React.useEffect(() => {
     const fetchHouseDetails = async () => {
@@ -37,7 +40,8 @@ function DetailScreen() {
       const houseDetails = houses.find(house => house.id === houseId);
       setHouse(houseDetails);
       setComments(houseDetails?.comments || []);
-      
+      console.log(houseDetails.comments);
+
       const user = JSON.parse(await AsyncStorage.getItem('logged'));
       setStoredUser(user);
       setIsFavorite(houseDetails?.favoriteUsers?.some(favUser => favUser.email === user.email) || false);
@@ -73,6 +77,7 @@ function DetailScreen() {
     const newCommentWithUser = {
       ...comment,
       name: loggedUser[0].name,
+      email: loggedUser[0].email
     };
 
     const updatedComments = [...comments, newCommentWithUser];
@@ -83,9 +88,7 @@ function DetailScreen() {
       comments: updatedComments,
     };
 
-    const houses = await localStorageService.getAllItems('houses');
-    const updatedHouses = houses.map(h => (h.id === houseId ? updatedHouse : h));
-    await localStorageService.setItem('houses', JSON.stringify(updatedHouses));
+    await localStorageService.updateItem('houses', updatedHouse.id, updatedHouse);
 
     setNewComment({ name: '', comment: '', rating: 0 });
     setModalVisible(false);
@@ -116,6 +119,19 @@ function DetailScreen() {
   const handleFavoritePress = () => {
     setTextoParaRemoverOuAdicionar(isFavorite ? 'remover' : 'adicionar');
     setFavoriteModalVisible(true);
+  };
+
+  const handleDeletePress = (comment) => {
+    setCommentToDelete(comment);
+    setDeleteModalVisible(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    const filteredComments = comments.filter((comment) => comment !== commentToDelete);
+    house.comments = filteredComments;
+    localStorageService.updateItem('houses', house.id, house);
+    setComments(filteredComments)
+    setDeleteModalVisible(false);
   };
 
   const renderStars = () => {
@@ -157,6 +173,10 @@ function DetailScreen() {
           source={{ uri: house.images[0] }}
           style={styles.imageBackground}
         >
+          <LinearGradient
+            colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+            style={styles.gradient}
+          />
           <View style={{ paddingLeft: 16 }}>
             <Text style={styles.title}>{house.propertyType}</Text>
           </View>
@@ -180,6 +200,11 @@ function DetailScreen() {
             <Text style={{ fontSize: 18, marginTop: 5 }}>{house.description}</Text>
           </View>
           <View style={styles.divider} />
+          <View style={styles.descriptionContainer}>
+            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Faculdade Próxima:</Text>
+            <Text style={{ fontSize: 18, marginTop: 5 }}>{house.nearbyCollege}</Text>
+          </View>
+          <View style={styles.divider} />
           <View style={styles.commentsContainer}>
             <View style={styles.commentsHeader}>
               <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>Comentários:</Text>
@@ -195,7 +220,9 @@ function DetailScreen() {
                   key={index}
                   name={comment.name}
                   comment={comment.comment}
+                  email={comment.email}
                   rating={comment.rating}
+                  onDelete={() => handleDeletePress(comment)}
                 />
               ))
             )}
@@ -222,6 +249,13 @@ function DetailScreen() {
             <View style={styles.modalButtons}>
               <Button onPress={() => setFavoriteModalVisible(false)} mode="contained" style={styles.modalButton}>Não</Button>
               <Button onPress={toggleFavorite} mode="contained" style={styles.modalButton}>Sim</Button>
+            </View>
+          </Modal>
+          <Modal visible={deleteModalVisible} onDismiss={() => setDeleteModalVisible(false)} contentContainerStyle={styles.modal}>
+            <Text>Tem certeza que deseja excluir este comentário?</Text>
+            <View style={styles.modalButtons}>
+              <Button onPress={() => setDeleteModalVisible(false)} mode="contained" style={styles.modalButton}>Não</Button>
+              <Button onPress={handleDeleteConfirm} mode="contained" style={styles.modalButton}>Sim</Button>
             </View>
           </Modal>
         </Portal>
@@ -263,6 +297,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 300,
     justifyContent: 'flex-end',
+  },
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+    height: '100%',
+    width: '100%',
   },
   iconContainer: {
     flexDirection: 'row',
@@ -344,6 +383,7 @@ const styles = StyleSheet.create({
   modalButtons: {
     flexDirection: 'row',
     marginTop: 20,
+    justifyContent: 'center'
   },
   modalButton: {
     marginHorizontal: 10,

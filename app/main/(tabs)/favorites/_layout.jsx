@@ -209,7 +209,7 @@ function FavoritesScreen() {
   const handleSearchSubmit = () => {
     Keyboard.dismiss();
     const searchLowerCase = search.toLowerCase();
-    const filtered = announcements.filter(announcement => 
+    const filtered = announcements.filter(announcement =>
       (announcement.city && announcement.city.toLowerCase().includes(searchLowerCase)) ||
       (announcement.neighborhood && announcement.neighborhood.toLowerCase().includes(searchLowerCase)) ||
       (announcement.price && announcement.price.toString().includes(search))
@@ -287,20 +287,22 @@ function FavoritesScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
-          <View style={styles.searchInputContainer}>
+          <View style={styles.section}>
+            <Text style={styles.text}>Favoritos</Text>
             <TouchableOpacity onPress={() => setFilterVisible(true)}>
-              <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
-            </TouchableOpacity>
+                <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
+              </TouchableOpacity>
           </View>
           <View style={styles.divider} />
         </View>
         <ScrollView style={styles.scrollView} contentContainerStyle={filteredAnnouncements.length === 0 ? styles.emptyScrollView : null}>
           {filteredAnnouncements.length === 0 ? (
-            <Text style={styles.emptyText}>Sem anúncios registrados</Text>
+            <Text style={styles.emptyText}>Sem favoritos registrados</Text>
           ) : (
             <View style={styles.cardsContainer}>
               {filteredAnnouncements.map((announcement, index) => (
                 <FavoriteCard
+                nearbyCollege={announcement.nearbyCollege}
                   key={index}
                   id={announcement.id}
                   title={announcement.city}
@@ -484,9 +486,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     backgroundColor: '#fff',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   scrollView: {
     flex: 1,

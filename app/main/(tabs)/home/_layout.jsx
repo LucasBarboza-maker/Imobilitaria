@@ -31,7 +31,7 @@ function HomeScreen() {
   React.useEffect(() => {
     const fetchFeaturedHouses = async () => {
       const houses = await localStorageService.getAllItems('houses');
-      setFeaturedHouses(houses.slice(0, 5)); // Show the first 5 houses as featured
+      setFeaturedHouses(houses.slice(0, 5)); 
     };
 
     const unsubscribe = navigation.addListener('focus', () => {
@@ -75,20 +75,9 @@ function HomeScreen() {
                   source={require('../../../../assets/images/logo.png')}
                   style={styles.logo}
                 />
-                <Text style={{ color: 'white', fontSize: 26, fontWeight: 'bold', marginBottom: 16 }}>
+                <Text style={{ color: 'white', fontSize: 32, fontWeight: 'bold' }}>
                   Imobilitária
                 </Text>
-                <View style={styles.searchInputContainer}>
-                  <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
-                  <TextInput
-                    placeholder="Pesquise por acomodações"
-                    placeholderTextColor="#aaaaaa"
-                    value={search}
-                    onChangeText={text => setSearch(text)}
-                    onSubmitEditing={handleSearchSubmit}
-                    style={styles.searchInput}
-                  />
-                </View>
               </View>
               <View style={{ width: '70%', paddingHorizontal: 20, height: '25%', alignContent: 'flex-end', justifyContent: 'flex-end' }}>
                 <Text style={{ color: 'white', fontSize: 32 }}>

@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import localStorageService from '../app/service/localStorageService';
 
-const AnnouncementCard = ({ title, value, icon, imageSource, description, id, refresh, navigation }) => {
+const AnnouncementCard = ({ nearbyCollege, title, value, icon, imageSource, description, id, refresh, navigation }) => {
   const handleDelete = () => {
     Alert.alert(
       "Confirmação de Exclusão",
@@ -21,11 +22,10 @@ const AnnouncementCard = ({ title, value, icon, imageSource, description, id, re
             const houses = await localStorageService.getAllItems('houses');
             const house = houses.filter(house => house.id === id);
 
-            if(house){
+            if (house) {
               localStorageService.deleteItem('houses', house[0].id);
               refresh()
             }
-
 
           },
         },
@@ -35,13 +35,17 @@ const AnnouncementCard = ({ title, value, icon, imageSource, description, id, re
   };
 
   const goToEditScreen = () => {
-    navigation.navigate("create-house", {id:id})
+    navigation.navigate("create-house", { id: id })
   }
 
   return (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
         <Image source={imageSource} style={styles.image} />
+        <LinearGradient
+          colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+          style={styles.gradient}
+        />
         <TouchableOpacity style={styles.editIcon} onPress={goToEditScreen}>
           <MaterialIcons name="edit" size={24} color="#fff" />
         </TouchableOpacity>
@@ -49,7 +53,13 @@ const AnnouncementCard = ({ title, value, icon, imageSource, description, id, re
           <MaterialIcons name="delete" size={24} color="red" />
         </TouchableOpacity>
         <View style={styles.bottomContainer}>
-          <Text style={styles.title}>{title}</Text>
+          <View>
+            <Text style={styles.title}>{title}</Text>
+            <View style={styles.collegeContainer}>
+              <MaterialIcons name="school" size={24} color="#fff" />
+              <Text style={styles.collegeText}>{nearbyCollege}</Text>
+            </View>
+          </View>
           <MaterialIcons name={icon} size={24} color="#fff" style={styles.icon} />
         </View>
       </View>
@@ -81,6 +91,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 10,
+  },
   editIcon: {
     position: 'absolute',
     top: 10,
@@ -111,7 +125,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  collegeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  collegeText: {
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 5,
+  },
   icon: {
+    position:'absolute',
+    right:0,
+    bottom:0,
     color: '#fff',
   },
   contentContainer: {

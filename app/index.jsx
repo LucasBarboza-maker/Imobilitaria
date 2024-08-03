@@ -15,9 +15,11 @@ function LoginScreen() {
   const [stayConnected, setStayConnected] = React.useState(false);
 
   React.useEffect(() => {
+    
+    localStorageService.deleteAllItems('logged');
+
     const loadStoredCredentials = async () => {
       try {
-        const storedUser = JSON.parse(await AsyncStorage.getItem('logged'));
         if (storedUser) {
           setUsername(storedUser.email);
           setPassword(storedUser.password);
@@ -45,6 +47,8 @@ function LoginScreen() {
     
       if (user) {
         if (true) {
+
+          await localStorageService.deleteAllItems('logged');
           // await AsyncStorage.setItem('logged', JSON.stringify({ email: username, password }));
           await localStorageService.saveItem('logged', user);
         } else {

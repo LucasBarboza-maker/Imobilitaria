@@ -19,14 +19,15 @@ const theme = {
 const fakeChatData = {
   id: '1',
   messages: [
-    { user: 'Alice', text: 'Hi there!' }
+    { user: 'Você', text: 'Olá Marcelo, a casa está disponivel?' },
+    { user: 'Marcelo', text: 'Olá! está disponivel sim' }
   ],
 };
 
 function ChatScreen() {
   const navigation = useNavigation();
   const [messages, setMessages] = React.useState(fakeChatData.messages);
-  const [newMessage, setNewMessage] = React.useState({ user: 'Current User', text: '' });
+  const [newMessage, setNewMessage] = React.useState({ user: 'Você', text: '' });
 
   const handleSendMessage = () => {
     if (newMessage.text.trim() === '') {
@@ -36,7 +37,7 @@ function ChatScreen() {
 
     const updatedMessages = [...messages, newMessage];
     setMessages(updatedMessages);
-    setNewMessage({ user: 'Current User', text: '' });
+    setNewMessage({ user: 'Você', text: '' });
   };
 
   return (
@@ -55,7 +56,7 @@ function ChatScreen() {
                 key={index} 
                 style={[
                   styles.messageContainer, 
-                  message.user === 'Current User' ? styles.myMessage : styles.otherMessage
+                  message.user === 'Você' ? styles.myMessage : styles.otherMessage
                 ]}
               >
                 <Text style={styles.messageUser}>{message.user}:</Text>

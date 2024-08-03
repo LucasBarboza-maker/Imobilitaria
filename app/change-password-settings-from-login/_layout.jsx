@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, Alert, ToastAndroid } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, Alert, ToastAndroid, ImageBackground } from 'react-native';
 import { useNavigation, useLocalSearchParams } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 import localStorageService from '../service/localStorageService';
 
 // Create a custom theme
@@ -62,56 +63,54 @@ function ChangePasswordScreen() {
 
   return (
     <PaperProvider theme={theme}>
-      <SafeAreaView style={styles.safeArea}>
-        <ExpoStatusBar style="auto" />
-        <View style={styles.headerContainer}>
-          <View style={styles.section}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-              <Icon name="arrow-left" size={24} color="#333" />
-            </TouchableOpacity>
-            <Text style={styles.text}>Alterar Senha</Text>
-          </View>
-          <View style={styles.divider} />
-        </View>
-        <View style={styles.inputContainer}>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              label="Nova Senha"
-              value={newPassword}
-              onChangeText={text => setNewPassword(text)}
-              style={styles.input}
-              mode="outlined"
-              secureTextEntry={!showNewPassword}
-              right={<TextInput.Icon name={showNewPassword ? "eye-off" : "eye"} onPress={() => setShowNewPassword(!showNewPassword)} />}
-            />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-              <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.passwordContainer}>
-            <TextInput
-              label="Confirmar Nova Senha"
-              value={confirmNewPassword}
-              onChangeText={text => setConfirmNewPassword(text)}
-              style={[styles.input, !passwordsMatch && styles.errorInput]}
-              mode="outlined"
-              secureTextEntry={!showConfirmPassword}
-              right={<TextInput.Icon name={showConfirmPassword ? "eye-off" : "eye"} onPress={() => setShowConfirmPassword(!showConfirmPassword)} />}
-              error={!passwordsMatch}
-            />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-              <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
-            </TouchableOpacity>
-          </View>
+      <ImageBackground source={require('../../assets/images/inner-cozy.png')} style={styles.backgroundImage}>
+        <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.8)']} style={styles.gradient}>
+          <SafeAreaView style={styles.safeArea}>
+            <ExpoStatusBar style="auto" />
+            <View style={styles.headerContainer}>
+              <View style={styles.section}>
+                {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                  <Icon name="arrow-left" size={24} color="#333" />
+                </TouchableOpacity> */}
+                <Text style={styles.text}>Alterar Senha</Text>
+              </View>
+              <View style={styles.divider} />
+            </View>
+            <View style={styles.inputContainer}>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  label="Nova Senha"
+                  value={newPassword}
+                  onChangeText={text => setNewPassword(text)}
+                  style={styles.input}
+                  mode="flat"
+                  secureTextEntry={!showNewPassword}
+                  right={<TextInput.Icon name={showNewPassword ? "eye-off" : "eye"} onPress={() => setShowNewPassword(!showNewPassword)} />}
+                />
+              </View>
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  label="Confirmar Nova Senha"
+                  value={confirmNewPassword}
+                  onChangeText={text => setConfirmNewPassword(text)}
+                  style={[styles.input, !passwordsMatch && styles.errorInput]}
+                  mode="flat"
+                  secureTextEntry={!showConfirmPassword}
+                  right={<TextInput.Icon name={showConfirmPassword ? "eye-off" : "eye"} onPress={() => setShowConfirmPassword(!showConfirmPassword)} />}
+                  error={!passwordsMatch}
+                />
+              </View>
 
-          {!passwordsMatch && (
-            <Text style={styles.errorText}>As senhas não são compatíveis</Text>
-          )}
-          <Button mode="contained" onPress={handleChangePassword} style={styles.saveButton}>
-            Alterar Senha
-          </Button>
-        </View>
-      </SafeAreaView>
+              {!passwordsMatch && (
+                <Text style={styles.errorText}>As senhas não são compatíveis</Text>
+              )}
+              <Button mode="contained" onPress={handleChangePassword} style={styles.saveButton}>
+                Alterar Senha
+              </Button>
+            </View>
+          </SafeAreaView>
+        </LinearGradient>
+      </ImageBackground>
     </PaperProvider>
   );
 }
@@ -119,11 +118,17 @@ function ChangePasswordScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
+  gradient: {
+    flex: 1,
+  },
   headerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
   },
   divider: {
     height: 1,
@@ -146,13 +151,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  eyeIcon: {
-    padding: 8,
-    position: 'absolute',
-    right: 0,
-    top: '30%',
-    transform: [{ translateY: -12 }]
-  },
   errorText: {
     color: 'red',
     marginBottom: 16,
@@ -165,7 +163,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontSize: 27,
     fontWeight: 'bold',
-    color: '#333333',
+    color: 'white',
   },
   section: {
     flexDirection: 'row',

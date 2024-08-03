@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, ToastAndroid} from 'react-native';
+import { View, Text, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, ToastAndroid, ImageBackground } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 import localStorageService from '../service/localStorageService';
 
 // Create a custom theme
@@ -50,8 +51,6 @@ function Settings() {
     loadStoredCredentials();
   }, []);
 
-
-
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -84,21 +83,19 @@ function Settings() {
     setCelularValid(isCelularValid);
 
     if (isEmailValid && isCelularValid) {
-
       const users = await localStorageService.getAllItems('users');
       const user = users.find(user => user.email === username);
 
       user.phone = celular.replace(/\D/g, '');
       user.email = email;
       user.name = nome;
-      
+
       localStorageService.updateUserItem('users', user.email, user);
 
       ToastAndroid.show('Sucesso ao alterar informações', ToastAndroid.SHORT);
       setTimeout(() => {
         navigation.goBack();
-      }, 3500); 
-
+      }, 3500);
     } else {
       console.log("Invalid email or celular!");
     }
@@ -106,49 +103,53 @@ function Settings() {
 
   return (
     <PaperProvider theme={theme}>
-      <SafeAreaView style={styles.safeArea}>
-        <ExpoStatusBar style="auto" />
-        <View style={styles.headerContainer}>
-          <View style={styles.section}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-              <Icon name="arrow-left" size={24} color="#333" />
-            </TouchableOpacity>
-            <Text style={styles.text}>Dados Pessoais</Text>
-          </View>
-          <View style={styles.divider} />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            label="Nome"
-            value={nome}
-            onChangeText={text => setNome(text)}
-            style={styles.input}
-            mode="outlined"
-          />
-          <TextInput
-            label="Sobrenome"
-            value={sobrenome}
-            onChangeText={text => setSobreNome(text)}
-            style={styles.input}
-            mode="outlined"
-          />
-          <TextInput
-            label="Celular"
-            value={celular}
-            onChangeText={text => handleCelularChange(text)}
-            style={[styles.input, !celularValid && styles.errorInput]}
-            mode="outlined"
-            keyboardType="phone-pad"
-            error={!celularValid}
-          />
-          {!celularValid && (
-            <Text style={styles.errorText}>Celular inválido</Text>
-          )}
-          <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
-            Salvar
-          </Button>
-        </View>
-      </SafeAreaView>
+      <ImageBackground source={require('../../assets/images/inner-cozy.png')} style={styles.backgroundImage}>
+        <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.8)']} style={styles.gradient}>
+          <SafeAreaView style={styles.safeArea}>
+            <ExpoStatusBar style="auto" />
+            <View style={styles.headerContainer}>
+              <View style={styles.section}>
+                {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                  <Icon name="arrow-left" size={24} color="#333" />
+                </TouchableOpacity> */}
+                <Text style={styles.text}>Dados Pessoais</Text>
+              </View>
+              <View style={styles.divider} />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                label="Nome"
+                value={nome}
+                onChangeText={text => setNome(text)}
+                style={styles.input}
+                mode="flat"
+              />
+              <TextInput
+                label="Sobrenome"
+                value={sobrenome}
+                onChangeText={text => setSobreNome(text)}
+                style={styles.input}
+                mode="flat"
+              />
+              <TextInput
+                label="Celular"
+                value={celular}
+                onChangeText={text => handleCelularChange(text)}
+                style={[styles.input, !celularValid && styles.errorInput]}
+                mode="flat"
+                keyboardType="phone-pad"
+                error={!celularValid}
+              />
+              {!celularValid && (
+                <Text style={styles.errorText}>Celular inválido</Text>
+              )}
+              <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
+                Salvar
+              </Button>
+            </View>
+          </SafeAreaView>
+        </LinearGradient>
+      </ImageBackground>
     </PaperProvider>
   );
 }
@@ -156,11 +157,17 @@ function Settings() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
+  gradient: {
+    flex: 1,
+  },
   headerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
   },
   divider: {
     height: 1,
@@ -189,7 +196,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontSize: 27,
     fontWeight: 'bold',
-    color: '#333333',
+    color: 'white',
   },
   section: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, Image, StatusBar, SafeAreaView, Platform, Alert, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, StatusBar, SafeAreaView, Platform, Alert, Dimensions, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Menu, TextInput } from 'react-native-paper';
@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import PagerView from 'react-native-pager-view';
+import { LinearGradient } from 'expo-linear-gradient';
 import localStorageService from '../service/localStorageService';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID
 
@@ -335,132 +336,136 @@ function CreateHouseScreen() {
 
   return (
     <PaperProvider theme={theme}>
-      <SafeAreaView style={styles.safeArea}>
-        <ExpoStatusBar style="auto" />
-        <Text style={styles.title}>Adicionar Imóvel</Text>
+      <ImageBackground source={require('../../assets/images/inner-cozy.png')} style={styles.backgroundImage}>
+        <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.8)']} style={styles.gradient}>
+          <SafeAreaView style={styles.safeArea}>
+            <ExpoStatusBar style="auto" />
+            <Text style={styles.title}>Adicionar Imóvel</Text>
 
-        {images.length > 0 && (
-          <PagerView style={styles.pagerView} initialPage={0}>
-            {images.map((item, index) => renderItem(item, index))}
-          </PagerView>
-        )}
+            {images.length > 0 && (
+              <PagerView style={styles.pagerView} initialPage={0}>
+                {images.map((item, index) => renderItem(item, index))}
+              </PagerView>
+            )}
 
-        <Button mode="contained" onPress={handleImageUpload} style={styles.button}>
-          Upload de Imagens
-        </Button>
+            <Button mode="contained" onPress={handleImageUpload} style={styles.button}>
+              Upload de Imagens
+            </Button>
 
-        <ScrollView>
-          <View style={{ borderWidth: 1, borderColor: errors.propertyType ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
-            <Menu
-              visible={propertyTypeMenuVisible}
-              onDismiss={() => setPropertyTypeMenuVisible(false)}
-              anchor={
-                <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
-                  <Text style={styles.menuText}>{propertyType || 'Selecione o tipo de imóvel'}</Text>
-                  <Icon name="arrow-drop-down" size={24} color="#000" />
-                </TouchableOpacity>
-              }
-            >
-              <Menu.Item onPress={() => { setPropertyType('Casa'); setPropertyTypeMenuVisible(false); }} title="Casa" />
-              <Menu.Item onPress={() => { setPropertyType('Kitnet'); setPropertyTypeMenuVisible(false); }} title="Kitnet" />
-              <Menu.Item onPress={() => { setPropertyType('Apartamento'); setPropertyTypeMenuVisible(false); }} title="Apartamento" />
-              <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setPropertyTypeMenuVisible(false); }} title="Imóvel Compartilhado" />
-            </Menu>
-          </View>
-          {errors.propertyType && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
-
-          <TextInput
-            label="Valor do Imóvel"
-            value={price}
-            onChangeText={text => setPrice(text)}
-            style={[styles.input, errors.price && styles.errorInput]}
-            keyboardType="numeric"
-            mode="outlined"
-          />
-          {errors.price && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
-
-          <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
-            <Menu
-              visible={stateMenuVisible}
-              onDismiss={() => setStateMenuVisible(false)}
-              anchor={
-                <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
-                  <Text style={styles.menuText}>{state || 'Selecione o estado'}</Text>
-                  <Icon name="arrow-drop-down" size={24} color="#000" />
-                </TouchableOpacity>
-              }
-            >
-              {STATES.map((state, index) => (
-                <Menu.Item key={index} onPress={() => { setState(state.value); setStateMenuVisible(false); }} title={state.label} />
-              ))}
-            </Menu>
-          </View>
-          {errors.state && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
-
-          {state === 'RJ' && (
-            <>
-              <View style={{ borderWidth: 1, borderColor: errors.city ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
+            <ScrollView>
+              <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                 <Menu
-                  visible={cityMenuVisible}
-                  onDismiss={() => setCityMenuVisible(false)}
+                  visible={propertyTypeMenuVisible}
+                  onDismiss={() => setPropertyTypeMenuVisible(false)}
                   anchor={
-                    <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
-                      <Text style={styles.menuText}>{city || 'Selecione a cidade'}</Text>
+                    <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{propertyType || 'Selecione o tipo de imóvel'}</Text>
                       <Icon name="arrow-drop-down" size={24} color="#000" />
                     </TouchableOpacity>
                   }
                 >
-                  {CITIES_RJ.map((city, index) => (
-                    <Menu.Item key={index} onPress={() => { setCity(city); setCityMenuVisible(false); }} title={city} />
-                  ))}
+                  <Menu.Item onPress={() => { setPropertyType('Casa'); setPropertyTypeMenuVisible(false); }} title="Casa" />
+                  <Menu.Item onPress={() => { setPropertyType('Kitnet'); setPropertyTypeMenuVisible(false); }} title="Kitnet" />
+                  <Menu.Item onPress={() => { setPropertyType('Apartamento'); setPropertyTypeMenuVisible(false); }} title="Apartamento" />
+                  <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setPropertyTypeMenuVisible(false); }} title="Imóvel Compartilhado" />
                 </Menu>
               </View>
-              {errors.city && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+              {errors.propertyType && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
-              <View style={{ borderWidth: 1, borderColor: errors.nearbyCollege ? 'red' : 'black', borderRadius: 5, marginBottom: 16 }}>
+              <TextInput
+                label="Valor do Imóvel"
+                value={price}
+                onChangeText={text => setPrice(text)}
+                style={[styles.input, errors.price && styles.errorInput]}
+                keyboardType="numeric"
+                mode="outlined"
+              />
+              {errors.price && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+
+              <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                 <Menu
-                  visible={collegeMenuVisible}
-                  onDismiss={() => setCollegeMenuVisible(false)}
+                  visible={stateMenuVisible}
+                  onDismiss={() => setStateMenuVisible(false)}
                   anchor={
-                    <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
-                      <Text style={styles.menuText}>{nearbyCollege || 'Selecione a faculdade próxima'}</Text>
+                    <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{state || 'Selecione o estado'}</Text>
                       <Icon name="arrow-drop-down" size={24} color="#000" />
                     </TouchableOpacity>
                   }
                 >
-                  {COLLEGES_RJ.map((college, index) => (
-                    <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
+                  {STATES.map((state, index) => (
+                    <Menu.Item key={index} onPress={() => { setState(state.value); setStateMenuVisible(false); }} title={state.label} />
                   ))}
                 </Menu>
               </View>
-              {errors.nearbyCollege && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
-            </>
-          )}
+              {errors.state && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
-          <TextInput
-            label="Bairro"
-            value={neighborhood}
-            onChangeText={text => setNeighborhood(text)}
-            style={[styles.input, errors.neighborhood && styles.errorInput]}
-            mode="outlined"
-          />
-          {errors.neighborhood && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+              {state === 'RJ' && (
+                <>
+                  <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
+                    <Menu
+                      visible={cityMenuVisible}
+                      onDismiss={() => setCityMenuVisible(false)}
+                      anchor={
+                        <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
+                          <Text style={styles.menuText}>{city || 'Selecione a cidade'}</Text>
+                          <Icon name="arrow-drop-down" size={24} color="#000" />
+                        </TouchableOpacity>
+                      }
+                    >
+                      {CITIES_RJ.map((city, index) => (
+                        <Menu.Item key={index} onPress={() => { setCity(city); setCityMenuVisible(false); }} title={city} />
+                      ))}
+                    </Menu>
+                  </View>
+                  {errors.city && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
-          <TextInput
-            label="Descrição"
-            value={description}
-            onChangeText={text => setDescription(text)}
-            style={[styles.input, styles.descriptionInput, errors.description && styles.errorInput]}
-            multiline
-            mode="outlined"
-          />
-          {errors.description && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+                  <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
+                  <Menu
+                      visible={collegeMenuVisible}
+                      onDismiss={() => setCollegeMenuVisible(false)}
+                      anchor={
+                        <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
+                          <Text style={styles.menuText}>{nearbyCollege || 'Selecione a faculdade próxima'}</Text>
+                          <Icon name="arrow-drop-down" size={24} color="#000" />
+                        </TouchableOpacity>
+                      }
+                    >
+                      {COLLEGES_RJ.map((college, index) => (
+                        <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
+                      ))}
+                    </Menu>
+                  </View>
+                  {errors.nearbyCollege && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+                </>
+              )}
 
-          <Button mode="contained" onPress={handleSubmit} style={styles.button}>
-            {id ? 'Editar' : 'Adicionar'} Imóvel
-          </Button>
-        </ScrollView>
-      </SafeAreaView>
+              <TextInput
+                label="Bairro"
+                value={neighborhood}
+                onChangeText={text => setNeighborhood(text)}
+                style={[styles.input, errors.neighborhood && styles.errorInput]}
+                mode="outlined"
+              />
+              {errors.neighborhood && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+
+              <TextInput
+                label="Descrição"
+                value={description}
+                onChangeText={text => setDescription(text)}
+                style={[styles.input, styles.descriptionInput, errors.description && styles.errorInput]}
+                multiline
+                mode="outlined"
+              />
+              {errors.description && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+
+              <Button mode="contained" onPress={handleSubmit} style={styles.button}>
+                {id ? 'Editar' : 'Adicionar'} Imóvel
+              </Button>
+            </ScrollView>
+          </SafeAreaView>
+        </LinearGradient>
+      </ImageBackground>
     </PaperProvider>
   );
 }
@@ -468,9 +473,15 @@ function CreateHouseScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    padding: 16
+    padding: 16,
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
+  gradient: {
+    flex: 1,
   },
   scrollView: {
     padding: 16,
@@ -479,11 +490,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
-    marginTop: 10
+    color: 'white',
+    marginTop: 10,
   },
   input: {
-    marginTop: 16,
-    marginBottom: 4,
+    marginBottom: 16,
     backgroundColor: '#fff',
   },
   errorInput: {

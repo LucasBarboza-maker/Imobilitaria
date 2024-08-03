@@ -307,7 +307,8 @@ function AnnouncementsScreen() {
       <SafeAreaView style={styles.safeArea}>
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
-          <View style={styles.searchInputContainer}>
+          <View style={styles.section}>
+            <Text style={styles.text}>Lista</Text>
             <TouchableOpacity onPress={openFilterModal}>
               <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
             </TouchableOpacity>
@@ -321,6 +322,7 @@ function AnnouncementsScreen() {
             <View style={styles.cardsContainer}>
               {announcements.map((announcement, index) => (
                 <FavoriteCard
+                  nearbyCollege={announcement.nearbyCollege}
                   key={index}
                   id={announcement.id}
                   title={announcement.city}
@@ -504,9 +506,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     backgroundColor: '#fff',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   scrollView: {
     flex: 1,

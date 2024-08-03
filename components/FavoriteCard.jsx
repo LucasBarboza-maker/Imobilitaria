@@ -1,24 +1,35 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 
-const AnnouncementCard = ({ id, title, value, icon, imageSource, description, onPress, setId, heartColor, setTextoParaRemoverOuAdicionar}) => {
+const AnnouncementCard = ({ nearbyCollege, id, title, value, icon, imageSource, description, onPress, setId, heartColor, setTextoParaRemoverOuAdicionar }) => {
   const navigation = useNavigation();
 
   function goToDetailScreen(id) {
-    navigation.navigate('house-details', { houseId: id});
+    navigation.navigate('house-details', { houseId: id });
   }
 
   return (
     <TouchableOpacity style={styles.card} onPress={() => goToDetailScreen(id)}>
       <View style={styles.imageContainer}>
         <Image source={imageSource} style={styles.image} />
-        <TouchableOpacity style={styles.editIcon} onPress={() => {setId(id); heartColor=='red'? setTextoParaRemoverOuAdicionar("remover") : setTextoParaRemoverOuAdicionar("adicionar"); onPress()}}>
+        <LinearGradient
+          colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+          style={styles.gradient}
+        />
+        <TouchableOpacity style={styles.editIcon} onPress={() => { setId(id); heartColor == 'red' ? setTextoParaRemoverOuAdicionar("remover") : setTextoParaRemoverOuAdicionar("adicionar"); onPress() }}>
           <MaterialIcons name="favorite" size={24} color={heartColor} />
         </TouchableOpacity>
         <View style={styles.bottomContainer}>
-          <Text style={styles.title}>{title}</Text>
+          <View>
+            <Text style={styles.title}>{title}</Text>
+            <View style={styles.collegeContainer}>
+              <MaterialIcons name="school" size={24} color="#fff" />
+              <Text style={styles.collegeText}>{nearbyCollege}</Text>
+            </View>
+          </View>
           <MaterialIcons name={icon} size={24} color="#fff" style={styles.icon} />
         </View>
       </View>
@@ -50,6 +61,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 10,
+  },
   editIcon: {
     position: 'absolute',
     top: 10,
@@ -72,7 +87,20 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  collegeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  collegeText: {
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 5,
+  },
   icon: {
+    position:'absolute',
+    right:0,
+    bottom:0,
     color: '#fff',
   },
   contentContainer: {

@@ -26,7 +26,7 @@ function Settings() {
           </View>
           <View style={styles.divider} />
         </View>
-        <ScrollView style={styles.scrollView}>
+        <View style={styles.scrollView}>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('profile')}>
               <Icon name="account" size={20} color="#fff" style={styles.icon} />
@@ -45,7 +45,7 @@ function Settings() {
               <Text style={styles.buttonText}>Sair</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </PaperProvider>
   );
@@ -62,6 +62,8 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    justifyContent:'center',
+    alignItems:'center',
   },
   divider: {
     height: 1,
@@ -71,6 +73,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     margin: 16,
+    width:'90%'
   },
   button: {
     backgroundColor: '#2457C5',
