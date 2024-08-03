@@ -76,7 +76,7 @@ function HomeScreen() {
                   style={styles.logo}
                 />
                 <Text style={{ color: 'white', fontSize: 26, fontWeight: 'bold', marginBottom: 16 }}>
-                  Imobiliária
+                  Imobilitária
                 </Text>
                 <View style={styles.searchInputContainer}>
                   <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
@@ -161,7 +161,7 @@ function HomeScreen() {
                 <Slider
                   style={{ width: '100%', height: 40 }}
                   minimumValue={0}
-                  maximumValue={100000}
+                  maximumValue={10000}
                   step={1000}
                   value={sliderValue}
                   onValueChange={setSliderValue}

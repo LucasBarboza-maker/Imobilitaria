@@ -19,15 +19,166 @@ const theme = {
   },
 };
 
+const STATES = [
+  { label: 'Acre', value: 'AC' },
+  { label: 'Alagoas', value: 'AL' },
+  { label: 'Amapá', value: 'AP' },
+  { label: 'Amazonas', value: 'AM' },
+  { label: 'Bahia', value: 'BA' },
+  { label: 'Ceará', value: 'CE' },
+  { label: 'Distrito Federal', value: 'DF' },
+  { label: 'Espírito Santo', value: 'ES' },
+  { label: 'Goiás', value: 'GO' },
+  { label: 'Maranhão', value: 'MA' },
+  { label: 'Mato Grosso', value: 'MT' },
+  { label: 'Mato Grosso do Sul', value: 'MS' },
+  { label: 'Minas Gerais', value: 'MG' },
+  { label: 'Pará', value: 'PA' },
+  { label: 'Paraíba', value: 'PB' },
+  { label: 'Paraná', value: 'PR' },
+  { label: 'Pernambuco', value: 'PE' },
+  { label: 'Piauí', value: 'PI' },
+  { label: 'Rio de Janeiro', value: 'RJ' },
+  { label: 'Rio Grande do Norte', value: 'RN' },
+  { label: 'Rio Grande do Sul', value: 'RS' },
+  { label: 'Rondônia', value: 'RO' },
+  { label: 'Roraima', value: 'RR' },
+  { label: 'Santa Catarina', value: 'SC' },
+  { label: 'São Paulo', value: 'SP' },
+  { label: 'Sergipe', value: 'SE' },
+  { label: 'Tocantins', value: 'TO' }
+];
+
+
+const CITIES_RJ = [
+  'Angra dos Reis',
+  'Aperibé',
+  'Araruama',
+  'Areal',
+  'Armação dos Búzios',
+  'Arraial do Cabo',
+  'Barra do Piraí',
+  'Barra Mansa',
+  'Belford Roxo',
+  'Bom Jardim',
+  'Bom Jesus do Itabapoana',
+  'Cabo Frio',
+  'Cachoeiras de Macacu',
+  'Cambuci',
+  'Campos dos Goytacazes',
+  'Cantagalo',
+  'Carapebus',
+  'Cardoso Moreira',
+  'Carmo',
+  'Casimiro de Abreu',
+  'Comendador Levy Gasparian',
+  'Conceição de Macabu',
+  'Cordeiro',
+  'Duas Barras',
+  'Duque de Caxias',
+  'Engenheiro Paulo de Frontin',
+  'Guapimirim',
+  'Iguaba Grande',
+  'Itaboraí',
+  'Itaguaí',
+  'Italva',
+  'Itaocara',
+  'Itaperuna',
+  'Itatiaia',
+  'Japeri',
+  'Laje do Muriaé',
+  'Macaé',
+  'Macuco',
+  'Magé',
+  'Mangaratiba',
+  'Maricá',
+  'Mendes',
+  'Mesquita',
+  'Miguel Pereira',
+  'Miracema',
+  'Natividade',
+  'Nilópolis',
+  'Niterói',
+  'Nova Friburgo',
+  'Nova Iguaçu',
+  'Paracambi',
+  'Paraíba do Sul',
+  'Paraty',
+  'Paty do Alferes',
+  'Petrópolis',
+  'Pinheiral',
+  'Piraí',
+  'Porciúncula',
+  'Porto Real',
+  'Quatis',
+  'Queimados',
+  'Quissamã',
+  'Resende',
+  'Rio Bonito',
+  'Rio Claro',
+  'Rio das Flores',
+  'Rio das Ostras',
+  'Rio de Janeiro',
+  'Santa Maria Madalena',
+  'Santo Antônio de Pádua',
+  'São Fidélis',
+  'São Francisco de Itabapoana',
+  'São Gonçalo',
+  'São João da Barra',
+  'São João de Meriti',
+  'São José de Ubá',
+  'São José do Vale do Rio Preto',
+  'São Pedro da Aldeia',
+  'São Sebastião do Alto',
+  'Sapucaia',
+  'Saquarema',
+  'Seropédica',
+  'Silva Jardim',
+  'Sumidouro',
+  'Tanguá',
+  'Teresópolis',
+  'Trajano de Moraes',
+  'Três Rios',
+  'Valença',
+  'Varre-Sai',
+  'Vassouras',
+  'Volta Redonda'
+];
+
+
+const COLLEGES_RJ = [
+  'Universidade Federal do Rio de Janeiro (UFRJ)',
+  'Universidade do Estado do Rio de Janeiro (UERJ)',
+  'Universidade Federal Fluminense (UFF)',
+  'Universidade Federal Rural do Rio de Janeiro (UFRRJ)',
+  'Centro Federal de Educação Tecnológica Celso Suckow da Fonseca (CEFET/RJ)',
+  'Instituto Federal de Educação, Ciência e Tecnologia do Rio de Janeiro (IFRJ)',
+  'Instituto Federal de Educação, Ciência e Tecnologia Fluminense (IFF)',
+  'Universidade do Grande Rio (Unigranrio)',
+  'Universidade Estadual do Norte Fluminense Darcy Ribeiro (UENF)',
+  'Escola Nacional de Ciências Estatísticas (ENCE)',
+  'Escola Superior de Desenho Industrial (ESDI)',
+  'Fundação Centro Universitário Estadual da Zona Oeste (UEZO)',
+  'Instituto Militar de Engenharia (IME)',
+  'Universidade Federal do Estado do Rio de Janeiro (UNIRIO)',
+  'Universidade Federal de Alfenas (UNIFAL)',
+  'Fundação Getulio Vargas (FGV)'
+];
+
+
 function FavoritesScreen() {
   const navigation = useNavigation();
   const [search, setSearch] = React.useState('');
   const [filterVisible, setFilterVisible] = React.useState(false);
   const [propertyType, setPropertyType] = React.useState('');
+  const [state, setState] = React.useState('');
   const [city, setCity] = React.useState('');
   const [neighborhood, setNeighborhood] = React.useState('');
   const [nearbyCollege, setNearbyCollege] = React.useState('');
-  const [menuVisible, setMenuVisible] = React.useState(false);
+  const [propertyTypeMenuVisible, setPropertyTypeMenuVisible] = React.useState(false);
+  const [stateMenuVisible, setStateMenuVisible] = React.useState(false);
+  const [cityMenuVisible, setCityMenuVisible] = React.useState(false);
+  const [collegeMenuVisible, setCollegeMenuVisible] = React.useState(false);
   const [sliderValue, setSliderValue] = React.useState(50000);
   const [announcements, setAnnouncements] = React.useState([]);
   const [filteredAnnouncements, setFilteredAnnouncements] = React.useState([]);
@@ -69,6 +220,7 @@ function FavoritesScreen() {
   const applyFilters = () => {
     const filterCriteria = {
       propertyType,
+      state,
       city,
       neighborhood,
       nearbyCollege,
@@ -76,9 +228,9 @@ function FavoritesScreen() {
     };
 
     const filtered = announcements.filter((announcement) => {
-      
       return (
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
+        (!filterCriteria.state || announcement.state === filterCriteria.state) &&
         (!filterCriteria.city || announcement.city.toLowerCase() === filterCriteria.city.toLowerCase()) &&
         (!filterCriteria.neighborhood || announcement.neighborhood.toLowerCase() === filterCriteria.neighborhood.toLowerCase()) &&
         (!filterCriteria.nearbyCollege || announcement.nearbyCollege.toLowerCase() === filterCriteria.nearbyCollege.toLowerCase()) &&
@@ -136,15 +288,6 @@ function FavoritesScreen() {
         <ExpoStatusBar style="auto" />
         <View style={styles.headerContainer}>
           <View style={styles.searchInputContainer}>
-            {/* <Icon name="magnify" size={24} color="#1D3D4C" style={styles.searchIcon} />
-            <TextInput
-              placeholder="Pesquise por acomodações"
-              placeholderTextColor="#aaaaaa"
-              value={search}
-              onChangeText={text => setSearch(text)}
-              onSubmitEditing={handleSearchSubmit}
-              style={styles.searchInput}
-            /> */}
             <TouchableOpacity onPress={() => setFilterVisible(true)}>
               <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
             </TouchableOpacity>
@@ -178,28 +321,83 @@ function FavoritesScreen() {
           <Modal visible={filterVisible} onDismiss={() => setFilterVisible(false)} contentContainerStyle={styles.modalContainer}>
             <ScrollView>
               <Text style={styles.modalTitle}>Filtrar Imóveis</Text>
-              <View style={styles.dropdownContainer}>
+              <View style={[styles.dropdownContainer, styles.input]}>
                 <Menu
-                  visible={menuVisible}
-                  onDismiss={() => setMenuVisible(false)}
+                  visible={propertyTypeMenuVisible}
+                  onDismiss={() => setPropertyTypeMenuVisible(false)}
                   anchor={
-                    <TouchableOpacity onPress={() => setMenuVisible(true)}>
-                      <TextInput
-                        label="Tipo de Imóvel"
-                        value={propertyType}
-                        style={styles.input}
-                        editable={false}
-                        right={<TextInput.Icon name="menu-down" />}
-                      />
+                    <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{propertyType || 'Tipo de Imóvel'}</Text>
+                      <Icon name="menu-down" size={24} color="#000" />
                     </TouchableOpacity>
                   }
+                  contentStyle={styles.dropdownMenu}
                 >
-                  <Menu.Item onPress={() => { setPropertyType('Casa'); setMenuVisible(false); }} title="Casa" />
-                  <Menu.Item onPress={() => { setPropertyType('Kitnet'); setMenuVisible(false); }} title="Kitnet" />
-                  <Menu.Item onPress={() => { setPropertyType('Apartamento'); setMenuVisible(false); }} title="Apartamento" />
-                  <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setMenuVisible(false); }} title="Imóvel Compartilhado" />
+                  <Menu.Item onPress={() => { setPropertyType('Casa'); setPropertyTypeMenuVisible(false); }} title="Casa" />
+                  <Menu.Item onPress={() => { setPropertyType('Kitnet'); setPropertyTypeMenuVisible(false); }} title="Kitnet" />
+                  <Menu.Item onPress={() => { setPropertyType('Apartamento'); setPropertyTypeMenuVisible(false); }} title="Apartamento" />
+                  <Menu.Item onPress={() => { setPropertyType('Imóvel Compartilhado'); setPropertyTypeMenuVisible(false); }} title="Imóvel Compartilhado" />
                 </Menu>
               </View>
+
+              <View style={[styles.dropdownContainer, styles.input]}>
+                <Menu
+                  visible={stateMenuVisible}
+                  onDismiss={() => setStateMenuVisible(false)}
+                  anchor={
+                    <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
+                      <Text style={styles.menuText}>{state || 'Selecione o Estado'}</Text>
+                      <Icon name="menu-down" size={24} color="#000" />
+                    </TouchableOpacity>
+                  }
+                  contentStyle={styles.dropdownMenu}
+                >
+                  {STATES.map((state, index) => (
+                    <Menu.Item key={index} onPress={() => { setState(state.value); setStateMenuVisible(false); }} title={state.label} />
+                  ))}
+                </Menu>
+              </View>
+
+              {state === 'RJ' && (
+                <>
+                  <View style={[styles.dropdownContainer, styles.input]}>
+                    <Menu
+                      visible={cityMenuVisible}
+                      onDismiss={() => setCityMenuVisible(false)}
+                      anchor={
+                        <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
+                          <Text style={styles.menuText}>{city || 'Selecione a Cidade'}</Text>
+                          <Icon name="menu-down" size={24} color="#000" />
+                        </TouchableOpacity>
+                      }
+                      contentStyle={styles.dropdownMenu}
+                    >
+                      {CITIES_RJ.map((city, index) => (
+                        <Menu.Item key={index} onPress={() => { setCity(city); setCityMenuVisible(false); }} title={city} />
+                      ))}
+                    </Menu>
+                  </View>
+
+                  <View style={[styles.dropdownContainer, styles.input]}>
+                    <Menu
+                      visible={collegeMenuVisible}
+                      onDismiss={() => setCollegeMenuVisible(false)}
+                      anchor={
+                        <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
+                          <Text style={styles.menuText}>{nearbyCollege || 'Selecione a Faculdade Próxima'}</Text>
+                          <Icon name="menu-down" size={24} color="#000" />
+                        </TouchableOpacity>
+                      }
+                      contentStyle={styles.dropdownMenu}
+                    >
+                      {COLLEGES_RJ.map((college, index) => (
+                        <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
+                      ))}
+                    </Menu>
+                  </View>
+                </>
+              )}
+
               <View style={styles.sliderContainer}>
                 <Text>Valor do Imóvel: R$ {sliderValue}</Text>
                 <Slider
@@ -213,24 +411,6 @@ function FavoritesScreen() {
                   maximumTrackTintColor="#000000"
                 />
               </View>
-              <TextInput
-                label="Cidade"
-                value={city}
-                onChangeText={text => setCity(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="Bairro"
-                value={neighborhood}
-                onChangeText={text => setNeighborhood(text)}
-                style={styles.input}
-              />
-              <TextInput
-                label="Faculdade Próxima"
-                value={nearbyCollege}
-                onChangeText={text => setNearbyCollege(text)}
-                style={styles.input}
-              />
               <Button mode="contained" onPress={applyFilters} style={styles.button}>
                 Aplicar Filtros
               </Button>
@@ -384,6 +564,30 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     marginHorizontal: 10,
+  },
+  menuButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+  },
+  menuText: {
+    flex: 1,
+    fontSize: 16,
+  },
+  dropdownContainer: {
+    marginBottom: 16,
+  },
+  dropdownMenu: {
+    backgroundColor: '#fff',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 16,
+    marginTop: 0,
   },
 });
 

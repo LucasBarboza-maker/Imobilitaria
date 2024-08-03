@@ -6,6 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import CommentCard from '../../components/CommentCard';
 import localStorageService from '../service/localStorageService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Create a custom theme
 const theme = {
@@ -25,6 +26,10 @@ function DetailScreen() {
   const [comments, setComments] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [newComment, setNewComment] = React.useState({ name: '', comment: '', rating: 0 });
+  const [storedUser, setStoredUser] = React.useState({});
+  const [isFavorite, setIsFavorite] = React.useState(false);
+  const [favoriteModalVisible, setFavoriteModalVisible] = React.useState(false);
+  const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useState('adicionar');
 
   React.useEffect(() => {
     const fetchHouseDetails = async () => {
@@ -32,10 +37,31 @@ function DetailScreen() {
       const houseDetails = houses.find(house => house.id === houseId);
       setHouse(houseDetails);
       setComments(houseDetails?.comments || []);
+      
+      const user = JSON.parse(await AsyncStorage.getItem('logged'));
+      setStoredUser(user);
+      setIsFavorite(houseDetails?.favoriteUsers?.some(favUser => favUser.email === user.email) || false);
     };
 
     fetchHouseDetails();
   }, [houseId]);
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchFavoriteStatus();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  const fetchFavoriteStatus = async () => {
+    const houses = await localStorageService.getAllItems('houses');
+    const houseDetails = houses.find(house => house.id === houseId);
+
+    const user = JSON.parse(await AsyncStorage.getItem('logged'));
+    setStoredUser(user);
+    setIsFavorite(houseDetails?.favoriteUsers?.some(favUser => favUser.email === user.email) || false);
+  };
 
   const handleAddComment = async (comment) => {
     const loggedUser = await localStorageService.getAllItems('logged');
@@ -43,44 +69,6 @@ function DetailScreen() {
       Alert.alert('Erro', 'Nenhum usuário está logado');
       return;
     }
-
-    const removeOrAddAnnouncement = async () => {
-      const houses = await localStorageService.getAllItems('houses');
-      const house = houses.find(house => house.id === id);
-
-      if (storedUser) {
-        const users = await localStorageService.getAllItems('users');
-        const user = users.find(user => user.email === storedUser.email);
-
-        if (house.favoriteUsers) {
-          if (checarFavorito(house) === 'red') {
-            house.favoriteUsers = house.favoriteUsers.filter((favoriteUser) => favoriteUser.email !== storedUser.email);
-          } else {
-            house.favoriteUsers.push(user);
-          }
-        } else {
-          house.favoriteUsers = [];
-          house.favoriteUsers.push(user);
-        }
-
-        localStorageService.updateItem('houses', house.id, house);
-      }
-      fetchFavoriteAnnouncements();
-      hideModal();
-    };
-
-
-    function checarFavorito(announcement) {
-      let favoriteUser = [];
-      if (announcement.favoriteUsers) {
-        favoriteUser = announcement.favoriteUsers.filter(fav => fav.email === storedUser.email);
-        if (favoriteUser.length > 0) {
-          return "red";
-        }
-      }
-      return "gray";
-    }
-
 
     const newCommentWithUser = {
       ...comment,
@@ -101,6 +89,33 @@ function DetailScreen() {
 
     setNewComment({ name: '', comment: '', rating: 0 });
     setModalVisible(false);
+  };
+
+  const toggleFavorite = async () => {
+    const houses = await localStorageService.getAllItems('houses');
+    const houseToUpdate = houses.find(house => house.id === houseId);
+
+    if (storedUser) {
+      if (houseToUpdate.favoriteUsers) {
+        if (isFavorite) {
+          houseToUpdate.favoriteUsers = houseToUpdate.favoriteUsers.filter((favoriteUser) => favoriteUser.email !== storedUser.email);
+        } else {
+          houseToUpdate.favoriteUsers.push(storedUser);
+        }
+      } else {
+        houseToUpdate.favoriteUsers = [storedUser];
+      }
+
+      await localStorageService.updateItem('houses', houseToUpdate.id, houseToUpdate);
+      setIsFavorite(!isFavorite);
+    }
+
+    setFavoriteModalVisible(false);
+  };
+
+  const handleFavoritePress = () => {
+    setTextoParaRemoverOuAdicionar(isFavorite ? 'remover' : 'adicionar');
+    setFavoriteModalVisible(true);
   };
 
   const renderStars = () => {
@@ -150,8 +165,8 @@ function DetailScreen() {
               <Text style={styles.title}><Text>R$</Text>{house.price}/<Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22, textAlign: 'right' }}>Mês</Text></Text>
             </View>
             <View style={styles.iconContainer}>
-              <TouchableOpacity style={styles.iconButton}>
-                <MaterialIcons name="favorite" size={24} color="white" />
+              <TouchableOpacity style={styles.iconButton} onPress={handleFavoritePress}>
+                <MaterialIcons name="favorite" size={24} color={isFavorite ? 'red' : 'white'} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconButton}>
                 <MaterialIcons name="share" size={24} color="white" />
@@ -201,6 +216,13 @@ function DetailScreen() {
             <Button mode="contained" onPress={() => handleAddComment(newComment)}>
               Adicionar
             </Button>
+          </Modal>
+          <Modal visible={favoriteModalVisible} onDismiss={() => setFavoriteModalVisible(false)} contentContainerStyle={styles.modal}>
+            <Text>Deseja {textoParaRemoverOuAdicionar} este anúncio dos favoritos?</Text>
+            <View style={styles.modalButtons}>
+              <Button onPress={() => setFavoriteModalVisible(false)} mode="contained" style={styles.modalButton}>Não</Button>
+              <Button onPress={toggleFavorite} mode="contained" style={styles.modalButton}>Sim</Button>
+            </View>
           </Modal>
         </Portal>
         <TouchableOpacity
@@ -318,6 +340,13 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 10,
     fontWeight: 'bold',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    marginTop: 20,
+  },
+  modalButton: {
+    marginHorizontal: 10,
   },
 });
 
