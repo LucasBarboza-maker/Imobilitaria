@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput, Alert, Dimensions } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { DefaultTheme, Provider as PaperProvider, Button, Modal, Portal } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import CommentCard from '../../components/CommentCard';
 import localStorageService from '../service/localStorageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PagerView from 'react-native-pager-view';
 
 // Create a custom theme
 const theme = {
@@ -18,6 +19,8 @@ const theme = {
     primary: '#2457C5',
   },
 };
+
+const { width: screenWidth } = Dimensions.get('window');
 
 function DetailScreen() {
   const route = useRoute();
@@ -40,7 +43,6 @@ function DetailScreen() {
       const houseDetails = houses.find(house => house.id === houseId);
       setHouse(houseDetails);
       setComments(houseDetails?.comments || []);
-      console.log(houseDetails.comments);
 
       const user = JSON.parse(await AsyncStorage.getItem('logged'));
       setStoredUser(user);
@@ -163,37 +165,37 @@ function DetailScreen() {
     <PaperProvider theme={theme}>
       <SafeAreaView style={styles.safeArea}>
         <ExpoStatusBar style="auto" />
-        <View style={styles.header}>
-          {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <MaterialIcons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity> */}
-          {/* <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Voltar</Text> */}
-        </View>
-        <ImageBackground
-          source={{ uri: house.images[0] }}
-          style={styles.imageBackground}
-        >
-          <LinearGradient
-            colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
-            style={styles.gradient}
-          />
-          <View style={{ paddingLeft: 16 }}>
-            <Text style={styles.title}>{house.propertyType}</Text>
-          </View>
-          <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', padding: 16 }}>
-            <View>
-              <Text style={styles.title}><Text>R$</Text>{house.price}/<Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22, textAlign: 'right' }}>Mês</Text></Text>
+        <PagerView style={styles.pagerView} initialPage={0}>
+          {house.images.map((image, index) => (
+            <View key={index} style={styles.imageContainer}>
+              <ImageBackground
+                source={{ uri: image }}
+                style={styles.imageBackground}
+              >
+                <LinearGradient
+                  colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+                  style={styles.gradient}
+                />
+                <View style={{ paddingLeft: 16 }}>
+                  <Text style={styles.title}>{house.propertyType}</Text>
+                </View>
+                <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', padding: 16 }}>
+                  <View>
+                    <Text style={styles.title}><Text>R$</Text>{house.price}/<Text style={{ color: 'white', fontWeight: 'bold', fontSize: 22, textAlign: 'right' }}>Mês</Text></Text>
+                  </View>
+                  <View style={styles.iconContainer}>
+                    <TouchableOpacity style={styles.iconButton} onPress={handleFavoritePress}>
+                      <MaterialIcons name="favorite" size={24} color={isFavorite ? 'red' : 'white'} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.iconButton}>
+                      <MaterialIcons name="share" size={24} color="white" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </ImageBackground>
             </View>
-            <View style={styles.iconContainer}>
-              <TouchableOpacity style={styles.iconButton} onPress={handleFavoritePress}>
-                <MaterialIcons name="favorite" size={24} color={isFavorite ? 'red' : 'white'} />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton}>
-                <MaterialIcons name="share" size={24} color="white" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </ImageBackground>
+          ))}
+        </PagerView>
         <ScrollView style={styles.container}>
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Description:</Text>
@@ -203,6 +205,16 @@ function DetailScreen() {
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Faculdade Próxima:</Text>
             <Text style={{ fontSize: 18, marginTop: 5 }}>{house.nearbyCollege}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.descriptionContainer}>
+            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Estado:</Text>
+            <Text style={{ fontSize: 18, marginTop: 5, color:'black' }}>{house.state}</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.descriptionContainer}>
+            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Estado:</Text>
+            <Text style={{ fontSize: 18, marginTop: 5, color:'black' }}>{house.city}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.commentsContainer}>
@@ -293,9 +305,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  pagerView: {
+    width: screenWidth,
+    height: 300,
+  },
+  imageContainer: {
+    width: screenWidth,
+    height: 300,
+  },
   imageBackground: {
     width: '100%',
-    height: 300,
+    height: '100%',
     justifyContent: 'flex-end',
   },
   gradient: {
@@ -366,7 +386,7 @@ const styles = StyleSheet.create({
   },
   chatButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 100,
     right: 20,
     backgroundColor: '#2457C5',
     borderRadius: 50,

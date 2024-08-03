@@ -16,10 +16,10 @@ function LoginScreen() {
 
   React.useEffect(() => {
     
-    localStorageService.deleteAllItems('logged');
-
     const loadStoredCredentials = async () => {
       try {
+        const storedUser = JSON.parse(await AsyncStorage.getItem('logged'));
+
         if (storedUser) {
           setUsername(storedUser.email);
           setPassword(storedUser.password);
