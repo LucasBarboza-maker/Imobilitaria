@@ -180,7 +180,7 @@ function AnnouncementsScreen() {
   const [stateMenuVisible, setStateMenuVisible] = React.useState(false);
   const [cityMenuVisible, setCityMenuVisible] = React.useState(false);
   const [collegeMenuVisible, setCollegeMenuVisible] = React.useState(false);
-  const [sliderValue, setSliderValue] = React.useState(50000);
+  const [sliderValue, setSliderValue] = React.useState(0);
   const [announcements, setAnnouncements] = React.useState([]);
   const [visible, setVisible] = React.useState(false);
   const [id, setId] = React.useState(null);
@@ -254,7 +254,7 @@ function AnnouncementsScreen() {
     setCity('');
     setNeighborhood('');
     setNearbyCollege('');
-    setSliderValue(50000);
+    setSliderValue(0);
   };
 
   const openFilterModal = () => {
@@ -558,6 +558,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 16,
+    width:'100%',
     backgroundColor: '#fff',
   },
   descriptionInput: {
@@ -592,6 +593,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#fff',
     borderRadius: 5,
+    width:'100%'
   },
   menuText: {
     flex: 1,

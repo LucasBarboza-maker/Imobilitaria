@@ -169,7 +169,8 @@ const theme = {
             <Checkbox
               status={termsAccepted ? 'checked' : 'unchecked'}
               onPress={() => setTermsAccepted(!termsAccepted)}
-              color="#4A90E2"
+              color="white"
+              uncheckedColor='white'
             />
             <TouchableOpacity onPress={() => setTermsVisible(true)}>
               <Text style={[styles.termsText, { textDecorationLine: 'underline' }]}>Eu aceito os Termos de Serviço</Text>

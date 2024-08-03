@@ -179,7 +179,7 @@ function FavoritesScreen() {
   const [stateMenuVisible, setStateMenuVisible] = React.useState(false);
   const [cityMenuVisible, setCityMenuVisible] = React.useState(false);
   const [collegeMenuVisible, setCollegeMenuVisible] = React.useState(false);
-  const [sliderValue, setSliderValue] = React.useState(50000);
+  const [sliderValue, setSliderValue] = React.useState(0);
   const [announcements, setAnnouncements] = React.useState([]);
   const [filteredAnnouncements, setFilteredAnnouncements] = React.useState([]);
   const [visible, setVisible] = React.useState(false);
@@ -572,6 +572,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#fff',
     borderRadius: 5,
+    width:'100%'
   },
   menuText: {
     flex: 1,
