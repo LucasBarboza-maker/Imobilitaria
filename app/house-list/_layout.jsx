@@ -346,6 +346,7 @@ function AnnouncementsScreen() {
               <View style={[styles.dropdownContainer, styles.input]}>
                 <Menu
                   visible={propertyTypeMenuVisible}
+                  style={{position:'relative', top:350,  width:'70%'}}
                   onDismiss={() => setPropertyTypeMenuVisible(false)}
                   anchor={
                     <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
@@ -366,6 +367,7 @@ function AnnouncementsScreen() {
                 <Menu
                   visible={stateMenuVisible}
                   onDismiss={() => setStateMenuVisible(false)}
+                  style={{position:'relative', top:350,  width:'70%'}}
                   anchor={
                     <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
                       <Text style={styles.menuText}>{state || 'Selecione o Estado'}</Text>
@@ -385,6 +387,7 @@ function AnnouncementsScreen() {
                   <View style={[styles.dropdownContainer, styles.input]}>
                     <Menu
                       visible={cityMenuVisible}
+                      style={{position:'relative', top:350,  width:'70%'}}
                       onDismiss={() => setCityMenuVisible(false)}
                       anchor={
                         <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
@@ -403,6 +406,7 @@ function AnnouncementsScreen() {
                   <View style={[styles.dropdownContainer, styles.input]}>
                     <Menu
                       visible={collegeMenuVisible}
+                      style={{position:'relative', top:350,  width:'70%'}}
                       onDismiss={() => setCollegeMenuVisible(false)}
                       anchor={
                         <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>

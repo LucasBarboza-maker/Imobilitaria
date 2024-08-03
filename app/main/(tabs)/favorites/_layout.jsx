@@ -290,8 +290,8 @@ function FavoritesScreen() {
           <View style={styles.section}>
             <Text style={styles.text}>Favoritos</Text>
             <TouchableOpacity onPress={() => setFilterVisible(true)}>
-                <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
-              </TouchableOpacity>
+              <Icon name="filter" size={24} color="#1D3D4C" style={styles.filterIcon} />
+            </TouchableOpacity>
           </View>
           <View style={styles.divider} />
         </View>
@@ -302,7 +302,7 @@ function FavoritesScreen() {
             <View style={styles.cardsContainer}>
               {filteredAnnouncements.map((announcement, index) => (
                 <FavoriteCard
-                nearbyCollege={announcement.nearbyCollege}
+                  nearbyCollege={announcement.nearbyCollege}
                   key={index}
                   id={announcement.id}
                   title={announcement.city}
@@ -326,6 +326,7 @@ function FavoritesScreen() {
               <View style={[styles.dropdownContainer, styles.input]}>
                 <Menu
                   visible={propertyTypeMenuVisible}
+                  style={{ position: 'relative', top: 260, width: '70%' }}
                   onDismiss={() => setPropertyTypeMenuVisible(false)}
                   anchor={
                     <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
@@ -344,6 +345,8 @@ function FavoritesScreen() {
 
               <View style={[styles.dropdownContainer, styles.input]}>
                 <Menu
+                  style={{ position: 'relative', top: 220,  width: '70%' }}
+
                   visible={stateMenuVisible}
                   onDismiss={() => setStateMenuVisible(false)}
                   anchor={
@@ -366,6 +369,7 @@ function FavoritesScreen() {
                     <Menu
                       visible={cityMenuVisible}
                       onDismiss={() => setCityMenuVisible(false)}
+                      style={{ position: 'relative', top: 300,  width: '70%' }}
                       anchor={
                         <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
                           <Text style={styles.menuText}>{city || 'Selecione a Cidade'}</Text>
@@ -383,6 +387,7 @@ function FavoritesScreen() {
                   <View style={[styles.dropdownContainer, styles.input]}>
                     <Menu
                       visible={collegeMenuVisible}
+                      style={{ position: 'relative', top: 300,  width: '70%' }}
                       onDismiss={() => setCollegeMenuVisible(false)}
                       anchor={
                         <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
@@ -572,7 +577,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#fff',
     borderRadius: 5,
-    width:'100%'
+    width: '100%'
   },
   menuText: {
     flex: 1,
