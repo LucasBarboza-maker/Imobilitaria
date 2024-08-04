@@ -14,10 +14,11 @@ function RegisterScreen() {
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [passwordStrength, setPasswordStrength] = React.useState(0);
   const [strengthLegend, setStrengthLegend] = React.useState('');
   const [termsAccepted, setTermsAccepted] = React.useState(false);
-  const [termsVisible, setTermsVisible] = React.useState(false); // State for modal visibility
+  const [termsVisible, setTermsVisible] = React.useState(false);
 
   const inputTheme = {
     colors: {
@@ -26,15 +27,14 @@ function RegisterScreen() {
     },
   };
 
-  // Create a custom theme
-const theme = {
-  ...DefaultTheme,
-  roundness: 2,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#2457C5',
-  },
-};
+  const theme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#2457C5',
+    },
+  };
 
   const calculatePasswordStrength = (password) => {
     let strength = 0;
@@ -94,7 +94,6 @@ const theme = {
 
   return (
     <PaperProvider theme={theme}>
-
       <ImageBackground
         source={require('../../assets/images/login_bg_image.png')}
         style={styles.backgroundImage}
@@ -146,25 +145,26 @@ const theme = {
               <Icon name={showPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
             </TouchableOpacity>
           </View>
-          <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', justifyContent: 'space-between', height: 16 }}>
-            {passwordStrength >= 25 ? <View style={{ width: '23%', height: 8, backgroundColor: 'red' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-            {passwordStrength >= 50 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-            {passwordStrength >= 75 ? <View style={{ width: '23%', height: 8, backgroundColor: 'yellow' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
-            {passwordStrength == 100 ? <View style={{ width: '23%', height: 8, backgroundColor: 'green' }}></View> : <View style={{ width: '23%', height: 8, backgroundColor: 'gray' }}></View>}
+          <View style={styles.progressBarContainer}>
+            {passwordStrength >= 25 ? <View style={styles.progressBarSegmentRed}></View> : <View style={styles.progressBarSegmentGray}></View>}
+            {passwordStrength >= 50 ? <View style={styles.progressBarSegmentYellow}></View> : <View style={styles.progressBarSegmentGray}></View>}
+            {passwordStrength >= 75 ? <View style={styles.progressBarSegmentYellow}></View> : <View style={styles.progressBarSegmentGray}></View>}
+            {passwordStrength === 100 ? <View style={styles.progressBarSegmentGreen}></View> : <View style={styles.progressBarSegmentGray}></View>}
           </View>
-          <View style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'center', justifyContent: 'space-between', height: 16, marginBottom: 16 }}>
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16, width: '100%' }}>
-              {strengthLegend}
-            </Text>
+          <Text style={styles.strengthLegend}>{strengthLegend}</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              label="Confirmar Senha"
+              value={confirmPassword}
+              onChangeText={text => setConfirmPassword(text)}
+              secureTextEntry={!showConfirmPassword}
+              style={[styles.input, { flex: 1, marginBottom: 8 }]}
+              theme={inputTheme}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.eyeIcon}>
+              <Icon name={showConfirmPassword ? "eye-off" : "eye"} size={24} color="#4A90E2" />
+            </TouchableOpacity>
           </View>
-          <TextInput
-            label="Confirmar Senha"
-            value={confirmPassword}
-            onChangeText={text => setConfirmPassword(text)}
-            secureTextEntry
-            style={styles.input}
-            theme={inputTheme}
-          />
           <View style={styles.termsContainer}>
             <Checkbox
               status={termsAccepted ? 'checked' : 'unchecked'}
@@ -192,16 +192,15 @@ const theme = {
               <Text style={styles.modalTitle}>Termos de Serviço</Text>
               <ScrollView>
                 <Text style={styles.modalContent}>
-                Estes são os Termos de Serviço do nosso aplicativo de aluguel de casas. Ao aceitar estes termos, você concorda em seguir as regras e regulamentos estabelecidos por este aplicativo. Por favor, leia cuidadosamente todos os termos e condições antes de aceitar. A aceitação destes termos é necessária para registrar-se e utilizar os serviços do nosso aplicativo de aluguel de casas.                </Text>
+                Estes são os Termos de Serviço do nosso aplicativo de aluguel de casas. Ao aceitar estes termos, você concorda em seguir as regras e regulamentos estabelecidos por este aplicativo. Por favor, leia cuidadosamente todos os termos e condições antes de aceitar. A aceitação destes termos é necessária para registrar-se e utilizar os serviços do nosso aplicativo de aluguel de casas.
+                </Text>
               </ScrollView>
               <Button onPress={() => setTermsVisible(false)} style={styles.closeButton}>Fechar</Button>
             </Modal>
           </Portal>
         </View>
       </ImageBackground>
-
     </PaperProvider>
-
   );
 }
 
@@ -246,11 +245,43 @@ const styles = StyleSheet.create({
     top: '30%',
     transform: [{ translateY: -12 }]
   },
-  progressBar: {
+  progressBarContainer: {
     width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 16,
+  },
+  progressBarSegmentGray: {
+    width: '23%',
     height: 8,
-    borderRadius: 4,
+    backgroundColor: 'gray',
+  },
+  progressBarSegmentRed: {
+    width: '23%',
+    height: 8,
+    backgroundColor: 'red',
+  },
+  progressBarSegmentYellow: {
+    width: '23%',
+    height: 8,
+    backgroundColor: 'yellow',
+  },
+  progressBarSegmentGreen: {
+    width: '23%',
+    height: 8,
+    backgroundColor: 'green',
+  },
+  strengthLegend: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    height: 16,
     marginBottom: 16,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   button: {
     width: '100%',

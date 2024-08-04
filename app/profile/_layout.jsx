@@ -22,9 +22,7 @@ function Settings() {
   const navigation = useNavigation();
   const [nome, setNome] = React.useState('');
   const [sobrenome, setSobreNome] = React.useState('');
-  const [email, setEmail] = React.useState('');
   const [celular, setCelular] = React.useState('');
-  const [emailValid, setEmailValid] = React.useState(true);
   const [celularValid, setCelularValid] = React.useState(true);
   const [username, setUsername] = React.useState();
 
@@ -36,7 +34,6 @@ function Settings() {
           const users = await localStorageService.getAllItems('users');
           const user = users.find(user => user.email === storedUser.email);
 
-          setEmail(user.email);
           setNome(user.name);
           setSobreNome(user.surname);
           handleCelularChange(user.phone);
@@ -50,11 +47,6 @@ function Settings() {
 
     loadStoredCredentials();
   }, []);
-
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
 
   const validateCelular = (celular) => {
     const regex = /^\(\d{2}\) \d{5}-\d{4}$/;
@@ -76,28 +68,26 @@ function Settings() {
   };
 
   const handleSave = async () => {
-    const isEmailValid = validateEmail(email);
     const isCelularValid = validateCelular(celular);
 
-    setEmailValid(isEmailValid);
     setCelularValid(isCelularValid);
 
-    if (isEmailValid && isCelularValid) {
+    if (isCelularValid) {
       const users = await localStorageService.getAllItems('users');
       const user = users.find(user => user.email === username);
 
       user.phone = celular.replace(/\D/g, '');
-      user.email = email;
       user.name = nome;
+      user.surname = sobrenome;
 
       localStorageService.updateUserItem('users', user.email, user);
 
       ToastAndroid.show('Sucesso ao alterar informações', ToastAndroid.SHORT);
       setTimeout(() => {
         navigation.goBack();
-      }, 3500);
+      }, 100);
     } else {
-      console.log("Invalid email or celular!");
+      console.log("Celular inválido!");
     }
   };
 
@@ -109,9 +99,6 @@ function Settings() {
             <ExpoStatusBar style="auto" />
             <View style={styles.headerContainer}>
               <View style={styles.section}>
-                {/* <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                  <Icon name="arrow-left" size={24} color="#333" />
-                </TouchableOpacity> */}
                 <Text style={styles.text}>Dados Pessoais</Text>
               </View>
               <View style={styles.divider} />

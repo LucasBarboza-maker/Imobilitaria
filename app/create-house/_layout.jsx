@@ -53,7 +53,6 @@ const STATES = [
   { label: 'Tocantins', value: 'TO' }
 ];
 
-
 const CITIES_RJ = [
   'Angra dos Reis',
   'Aperibé',
@@ -149,7 +148,6 @@ const CITIES_RJ = [
   'Volta Redonda'
 ];
 
-
 const COLLEGES_RJ = [
   'Universidade Federal do Rio de Janeiro (UFRJ)',
   'Universidade do Estado do Rio de Janeiro (UERJ)',
@@ -168,7 +166,6 @@ const COLLEGES_RJ = [
   'Universidade Federal de Alfenas (UNIFAL)',
   'Fundação Getulio Vargas (FGV)'
 ];
-
 
 function CreateHouseScreen() {
   const navigation = useNavigation();
@@ -315,6 +312,7 @@ function CreateHouseScreen() {
         Alert.alert("Sucesso", "Imóvel atualizado com sucesso");
         await localStorageService.updateItem('houses', house.id, house);
       }
+      navigation.navigate('main/(tabs)');
       setTimeout(() => {
         navigation.goBack();
       }, 3500);
@@ -357,7 +355,7 @@ function CreateHouseScreen() {
                 <Menu
                   visible={propertyTypeMenuVisible}
                   onDismiss={() => setPropertyTypeMenuVisible(false)}
-                  style={{position:'relative',  width:'70%', top:210}}
+                  style={{ position: 'relative', width: '70%', top: 210 }}
                   anchor={
                     <TouchableOpacity onPress={() => setPropertyTypeMenuVisible(true)} style={styles.menuButton}>
                       <Text style={styles.menuText}>{propertyType || 'Selecione o tipo de imóvel'}</Text>
@@ -386,7 +384,7 @@ function CreateHouseScreen() {
               <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                 <Menu
                   visible={stateMenuVisible}
-                  style={{position:'relative', top:350,  width:'70%'}}
+                  style={{ position: 'relative', top: 350, width: '70%' }}
                   onDismiss={() => setStateMenuVisible(false)}
                   anchor={
                     <TouchableOpacity onPress={() => setStateMenuVisible(true)} style={styles.menuButton}>
@@ -407,7 +405,7 @@ function CreateHouseScreen() {
                   <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                     <Menu
                       visible={cityMenuVisible}
-                      style={{position:'relative',  width:'70%', top:410}}
+                      style={{ position: 'relative', width: '70%', top: 410 }}
                       onDismiss={() => setCityMenuVisible(false)}
                       anchor={
                         <TouchableOpacity onPress={() => setCityMenuVisible(true)} style={styles.menuButton}>
@@ -423,11 +421,20 @@ function CreateHouseScreen() {
                   </View>
                   {errors.city && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
+                  <TextInput
+                    label="Bairro"
+                    value={neighborhood}
+                    onChangeText={text => setNeighborhood(text)}
+                    style={[styles.input, errors.neighborhood && styles.errorInput]}
+                    mode="flat"
+                  />
+                  {errors.neighborhood && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+
                   <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
-                  <Menu
+                    <Menu
                       visible={collegeMenuVisible}
                       onDismiss={() => setCollegeMenuVisible(false)}
-                      style={{position:'relative',  width:'70%', top:480}}
+                      style={{ position: 'relative', width: '70%', top: 480 }}
                       anchor={
                         <TouchableOpacity onPress={() => setCollegeMenuVisible(true)} style={styles.menuButton}>
                           <Text style={styles.menuText}>{nearbyCollege || 'Selecione a faculdade próxima'}</Text>
@@ -443,15 +450,6 @@ function CreateHouseScreen() {
                   {errors.nearbyCollege && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
                 </>
               )}
-
-              <TextInput
-                label="Bairro"
-                value={neighborhood}
-                onChangeText={text => setNeighborhood(text)}
-                style={[styles.input, errors.neighborhood && styles.errorInput]}
-                mode="flat"
-              />
-              {errors.neighborhood && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
               <TextInput
                 label="Descrição"

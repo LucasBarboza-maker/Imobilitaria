@@ -48,7 +48,6 @@ const STATES = [
   { label: 'Tocantins', value: 'TO' }
 ];
 
-
 const CITIES_RJ = [
   'Angra dos Reis',
   'Aperibé',
@@ -144,7 +143,6 @@ const CITIES_RJ = [
   'Volta Redonda'
 ];
 
-
 const COLLEGES_RJ = [
   'Universidade Federal do Rio de Janeiro (UFRJ)',
   'Universidade do Estado do Rio de Janeiro (UERJ)',
@@ -163,7 +161,6 @@ const COLLEGES_RJ = [
   'Universidade Federal de Alfenas (UNIFAL)',
   'Fundação Getulio Vargas (FGV)'
 ];
-
 
 function AnnouncementsScreen() {
   const navigation = useNavigation();
@@ -238,7 +235,7 @@ function AnnouncementsScreen() {
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
         (!filterCriteria.state || announcement.state === filterCriteria.state) &&
         (!filterCriteria.city || announcement.city === filterCriteria.city) &&
-        (!filterCriteria.neighborhood || announcement.neighborhood === filterCriteria.neighborhood) &&
+        (!filterCriteria.nearbyCollege || announcement.neighborhood.toLowerCase().includes(filterCriteria.neighborhood.toLowerCase())) &&
         (!filterCriteria.nearbyCollege || announcement.nearbyCollege === filterCriteria.nearbyCollege) &&
         (announcement.price <= filterCriteria.price)
       );
@@ -402,6 +399,14 @@ function AnnouncementsScreen() {
                       ))}
                     </Menu>
                   </View>
+
+                  <TextInput
+                    label="Bairro"
+                    value={neighborhood}
+                    onChangeText={text => setNeighborhood(text)}
+                    style={[styles.input]}
+                    mode="flat"
+                  />
 
                   <View style={[styles.dropdownContainer, styles.input]}>
                     <Menu

@@ -198,7 +198,7 @@ function DetailScreen() {
         </PagerView>
         <ScrollView style={styles.container}>
           <View style={styles.descriptionContainer}>
-            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Description:</Text>
+            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Descrição:</Text>
             <Text style={{ fontSize: 18, marginTop: 5 }}>{house.description}</Text>
           </View>
           <View style={styles.divider} />
@@ -213,8 +213,12 @@ function DetailScreen() {
           </View>
           <View style={styles.divider} />
           <View style={styles.descriptionContainer}>
-            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Estado:</Text>
+            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Cidade:</Text>
             <Text style={{ fontSize: 18, marginTop: 5, color:'black' }}>{house.city}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Bairro:</Text>
+            <Text style={{ fontSize: 18, marginTop: 5 }}>{house.neighborhood}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.commentsContainer}>

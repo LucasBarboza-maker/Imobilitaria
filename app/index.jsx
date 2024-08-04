@@ -7,6 +7,8 @@ import CustomCheckbox from '../components/CustomCheckbox';
 import localStorageService from './service/localStorageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+console.disableYellowBox = true;
+
 function LoginScreen() {
   const navigation = useNavigation();
   const [username, setUsername] = React.useState('');
@@ -73,7 +75,7 @@ function LoginScreen() {
           source={require('../assets/images/logo.png')}
           style={styles.logo}
         />
-        <Text style={styles.text}>Imobiliária</Text>
+        <Text style={styles.text}>Imobilitária</Text>
         <TextInput
           label="Email"
           value={username}

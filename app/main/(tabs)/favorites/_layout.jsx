@@ -232,8 +232,8 @@ function FavoritesScreen() {
         (!filterCriteria.propertyType || announcement.propertyType === filterCriteria.propertyType) &&
         (!filterCriteria.state || announcement.state === filterCriteria.state) &&
         (!filterCriteria.city || announcement.city.toLowerCase() === filterCriteria.city.toLowerCase()) &&
-        (!filterCriteria.neighborhood || announcement.neighborhood.toLowerCase() === filterCriteria.neighborhood.toLowerCase()) &&
-        (!filterCriteria.nearbyCollege || announcement.nearbyCollege.toLowerCase() === filterCriteria.nearbyCollege.toLowerCase()) &&
+        (!filterCriteria.nearbyCollege || announcement.neighborhood.toLowerCase().includes(filterCriteria.neighborhood.toLowerCase())) &&
+        (!filterCriteria.nearbyCollege || announcement.nearbyCollege.toLowerCase().includes(filterCriteria.nearbyCollege.toLowerCase())) &&
         (announcement.price <= filterCriteria.price)
       );
     });
@@ -346,7 +346,6 @@ function FavoritesScreen() {
               <View style={[styles.dropdownContainer, styles.input]}>
                 <Menu
                   style={{ position: 'relative', top: 220,  width: '70%' }}
-
                   visible={stateMenuVisible}
                   onDismiss={() => setStateMenuVisible(false)}
                   anchor={
@@ -383,6 +382,13 @@ function FavoritesScreen() {
                       ))}
                     </Menu>
                   </View>
+
+                  <TextInput
+                    label="Bairro"
+                    value={neighborhood}
+                    onChangeText={text => setNeighborhood(text)}
+                    style={styles.input}
+                  />
 
                   <View style={[styles.dropdownContainer, styles.input]}>
                     <Menu
