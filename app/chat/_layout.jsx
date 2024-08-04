@@ -18,7 +18,7 @@ function ChatScreen() {
   const navigation = useNavigation();
   const params = useLocalSearchParams();
   const { conversatorName, messages: initialMessages } = params;
-  const [messages, setMessages] = React.useState(JSON.parse(initialMessages));
+  const [messages, setMessages] = React.useState(initialMessages ? JSON.parse(initialMessages) : []);
   const [newMessage, setNewMessage] = React.useState({ user: 'Você', text: '' });
 
   const handleSendMessage = () => {
@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   emptyText: {
+    textAlign:'center',
     fontSize: 18,
     color: '#999',
   },

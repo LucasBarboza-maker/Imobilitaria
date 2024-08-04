@@ -209,12 +209,12 @@ function DetailScreen() {
           <View style={styles.divider} />
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Estado:</Text>
-            <Text style={{ fontSize: 18, marginTop: 5, color:'black' }}>{house.state}</Text>
+            <Text style={{ fontSize: 18, marginTop: 5, color: 'black' }}>{house.state}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Cidade:</Text>
-            <Text style={{ fontSize: 18, marginTop: 5, color:'black' }}>{house.city}</Text>
+            <Text style={{ fontSize: 18, marginTop: 5, color: 'black' }}>{house.city}</Text>
           </View>
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Bairro:</Text>
@@ -277,7 +277,7 @@ function DetailScreen() {
         </Portal>
         <TouchableOpacity
           style={styles.chatButton}
-          onPress={() => navigation.navigate('chat')}
+          onPress={() => navigation.navigate('chat', { conversatorName: house.announcer.name })}
         >
           <MaterialIcons name="chat" size={24} color="white" />
           <Text style={styles.chatButtonText}>Chat</Text>
