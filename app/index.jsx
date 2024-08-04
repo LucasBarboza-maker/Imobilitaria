@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, Checkbox } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import CustomCheckbox from '../components/CustomCheckbox';
 import localStorageService from './service/localStorageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -17,7 +16,7 @@ function LoginScreen() {
   const [stayConnected, setStayConnected] = React.useState(false);
 
   React.useEffect(() => {
-    
+
     const loadStoredCredentials = async () => {
       try {
         const storedUser = JSON.parse(await AsyncStorage.getItem('logged'));
@@ -46,7 +45,7 @@ function LoginScreen() {
     try {
       const users = await localStorageService.getAllItems('users');
       const user = users.find(user => user.email === username && user.password === password);
-    
+
       if (user) {
         if (true) {
 
@@ -97,10 +96,11 @@ function LoginScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.checkboxContainer}>
-          <CustomCheckbox
-            checked={stayConnected}
+          <Checkbox
             onPress={() => setStayConnected(!stayConnected)}
-            borderColor="#4A90E2"
+            status={stayConnected ? 'checked' : 'unchecked'}
+            color="white"
+            uncheckedColor='white'
           />
           <Text style={styles.checkboxLabel}>Manter-me conectado</Text>
         </View>

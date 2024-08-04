@@ -4,34 +4,26 @@ import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { DefaultTheme, Provider as PaperProvider, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
 
 // Create a custom theme
 const theme = {
-  ...DefaultTheme,
   roundness: 2,
   colors: {
-    ...DefaultTheme.colors,
     primary: '#2457C5',
   },
 };
 
-// Fake chat messages data
-const fakeChatData = {
-  id: '1',
-  messages: [
-    { user: 'Você', text: 'Olá Marcelo, a casa está disponivel?' },
-    { user: 'Marcelo', text: 'Olá! está disponivel sim' }
-  ],
-};
-
 function ChatScreen() {
   const navigation = useNavigation();
-  const [messages, setMessages] = React.useState(fakeChatData.messages);
+  const params = useLocalSearchParams();
+  const { conversatorName, messages: initialMessages } = params;
+  const [messages, setMessages] = React.useState(JSON.parse(initialMessages));
   const [newMessage, setNewMessage] = React.useState({ user: 'Você', text: '' });
 
   const handleSendMessage = () => {
     if (newMessage.text.trim() === '') {
-      Alert.alert('Error', 'Message cannot be empty');
+      Alert.alert('Error', 'A Mensagem não pode ser vazia');
       return;
     }
 
@@ -40,12 +32,15 @@ function ChatScreen() {
     setNewMessage({ user: 'Você', text: '' });
   };
 
+  React.useEffect(() => {
+    console.log(messages)
+  }, [messages])
+
   return (
     <PaperProvider theme={theme}>
       <SafeAreaView style={styles.safeArea}>
-        <ExpoStatusBar style="auto" />
         <View style={styles.header}>
-          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Chat</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{conversatorName}</Text>
         </View>
         <ScrollView style={styles.container}>
           {messages.length === 0 ? (
@@ -68,12 +63,12 @@ function ChatScreen() {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Type a message"
+            placeholder="Digite aqui"
             value={newMessage.text}
             onChangeText={(text) => setNewMessage({ ...newMessage, text })}
           />
-          <Button mode="contained" onPress={handleSendMessage}>
-            Send
+          <Button textColor='white' mode="contained" onPress={handleSendMessage}>
+            Enviar
           </Button>
         </View>
       </SafeAreaView>
@@ -91,9 +86,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-  },
-  backButton: {
-    marginRight: 16,
   },
   container: {
     flex: 1,

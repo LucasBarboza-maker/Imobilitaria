@@ -13,6 +13,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="chat-list"
+        options={{
+          title: 'Chat',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="comments" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="announcements"
         options={{
           title: 'Meus Anúncios',

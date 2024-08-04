@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, TouchableOpacity, ImageBackground } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Icon } from 'react-native-paper';
@@ -18,35 +18,38 @@ function Settings() {
   const navigation = useNavigation();
   return (
     <PaperProvider theme={theme}>
-      <SafeAreaView style={styles.safeArea}>
-        <ExpoStatusBar style="auto" />
-        <View style={styles.headerContainer}>
-          <View style={styles.section}>
-            <Text style={styles.text}>Menu</Text>
+      <ImageBackground source={require('../../../../assets/images/inner-cozy.png')} style={styles.backgroundImage}>
+        <SafeAreaView style={styles.safeArea}>
+          <ExpoStatusBar style="auto" />
+          <View style={styles.headerContainer}>
+            <View style={styles.section}>
+              <Text style={styles.text}>Menu</Text>
+            </View>
+            <View style={styles.divider} />
           </View>
-          <View style={styles.divider} />
-        </View>
-        <View style={styles.scrollView}>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('profile')}>
-              <Icon name="account" size={20} color="#fff" style={styles.icon} />
-              <Text style={styles.buttonText}>Editar Dados Pessoais</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('change-password-settings')}>
-              <Icon name="lock" size={20} color="#fff" style={styles.icon} />
-              <Text style={styles.buttonText}>Alterar Senha</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('help')}>
-              <Icon name="help-circle" size={20} color="#fff" style={styles.icon} />
-              <Text style={styles.buttonText}>Ajuda</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('index')}>
-              <Icon name="exit-to-app" size={20} color="#fff" style={styles.icon} />
-              <Text style={styles.buttonText}>Sair</Text>
-            </TouchableOpacity>
+          <View style={styles.scrollView}>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('profile')}>
+                <Icon name="account" size={20} color="#fff" style={styles.icon} />
+                <Text style={styles.buttonText}>Editar Dados Pessoais</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('change-password-settings')}>
+                <Icon name="lock" size={20} color="#fff" style={styles.icon} />
+                <Text style={styles.buttonText}>Alterar Senha</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('help')}>
+                <Icon name="help-circle" size={20} color="#fff" style={styles.icon} />
+                <Text style={styles.buttonText}>Ajuda</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('index')}>
+                <Icon name="exit-to-app" size={20} color="#fff" style={styles.icon} />
+                <Text style={styles.buttonText}>Sair</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+
+      </ImageBackground>
     </PaperProvider>
   );
 }
@@ -54,16 +57,18 @@ function Settings() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   headerContainer: {
-    backgroundColor: '#fff',
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
   },
   scrollView: {
     flex: 1,
-    justifyContent:'center',
-    alignItems:'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   divider: {
     height: 1,
@@ -73,7 +78,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     margin: 16,
-    width:'90%'
+    width: '90%'
   },
   button: {
     backgroundColor: '#2457C5',
@@ -85,8 +90,8 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
-    height:20,
-    width:20
+    height: 20,
+    width: 20
   },
   buttonText: {
     color: '#fff',
@@ -98,7 +103,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontSize: 27,
     fontWeight: 'bold',
-    color: '#333333',
+    color: 'white',
   },
   section: {
     flexDirection: 'row',
