@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput, Alert, Dimensions } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput, Alert, Dimensions, Share } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { DefaultTheme, Provider as PaperProvider, Button, Modal, Portal } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -132,7 +132,7 @@ function DetailScreen() {
     const filteredComments = comments.filter((comment) => comment !== commentToDelete);
     house.comments = filteredComments;
     localStorageService.updateItem('houses', house.id, house);
-    setComments(filteredComments)
+    setComments(filteredComments);
     setDeleteModalVisible(false);
   };
 
@@ -146,6 +146,18 @@ function DetailScreen() {
         />
       </TouchableOpacity>
     ));
+  };
+
+  const handleShare = async () => {
+    try {
+      const shareMessage = `Confira este imóvel na Imobilitária!\n\nTipo: ${house.propertyType}\nPreço: R$${house.price}/Mês\nDescrição: ${house.description}\nEstado: ${house.state}\nCidade: ${house.city}\nBairro: ${house.neighborhood}\nContato do anunciante: ${house.announcer.email}\nNome: ${house.announcer.name}\nTelefone: ${house.announcer.phone}`;
+      await Share.share({
+        message: shareMessage,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+      Alert.alert('Erro', `Ocorreu um erro ao tentar compartilhar: ${error.message}`);
+    }
   };
 
   if (!house) {
@@ -187,7 +199,7 @@ function DetailScreen() {
                     <TouchableOpacity style={styles.iconButton} onPress={handleFavoritePress}>
                       <MaterialIcons name="favorite" size={24} color={isFavorite ? 'red' : 'white'} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
                       <MaterialIcons name="share" size={24} color="white" />
                     </TouchableOpacity>
                   </View>
@@ -211,7 +223,6 @@ function DetailScreen() {
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Estado:</Text>
             <Text style={{ fontSize: 18, marginTop: 5, color: 'black' }}>{house.state}</Text>
           </View>
-          <View style={styles.divider} />
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Cidade:</Text>
             <Text style={{ fontSize: 18, marginTop: 5, color: 'black' }}>{house.city}</Text>
@@ -330,7 +341,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    width: '50%'
+    width: '50%',
   },
   iconButton: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -340,11 +351,11 @@ const styles = StyleSheet.create({
   },
   title: {
     color: 'white',
-    fontSize: 30
+    fontSize: 30,
   },
   descriptionContainer: {
     fontSize: 16,
-    padding: 16
+    padding: 16,
   },
   divider: {
     height: 1,
@@ -407,7 +418,7 @@ const styles = StyleSheet.create({
   modalButtons: {
     flexDirection: 'row',
     marginTop: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   modalButton: {
     marginHorizontal: 10,
