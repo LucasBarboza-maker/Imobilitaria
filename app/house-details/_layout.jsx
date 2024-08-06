@@ -46,6 +46,7 @@ function DetailScreen() {
 
       const user = JSON.parse(await AsyncStorage.getItem('logged'));
       setStoredUser(user);
+      console.log(user)
       setIsFavorite(houseDetails?.favoriteUsers?.some(favUser => favUser.email === user.email) || false);
     };
 
@@ -99,6 +100,8 @@ function DetailScreen() {
   const toggleFavorite = async () => {
     const houses = await localStorageService.getAllItems('houses');
     const houseToUpdate = houses.find(house => house.id === houseId);
+
+    console.log(storedUser)
 
     if (storedUser) {
       if (houseToUpdate.favoriteUsers) {
