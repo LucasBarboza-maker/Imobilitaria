@@ -59,7 +59,6 @@ function ChangePasswordScreen() {
 
     }
 
-    console.log({ currentPassword, newPassword, confirmNewPassword });
   };
 
   return (

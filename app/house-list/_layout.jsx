@@ -324,7 +324,7 @@ function AnnouncementsScreen() {
                   id={announcement.id}
                   title={announcement.city}
                   value={announcement.price}
-                  description={announcement.description}
+                  description={announcement.description.substring(0,50)+"..."}
                   icon="home"
                   imageSource={{ uri: announcement.images[0] }}
                   onPress={showModal}
