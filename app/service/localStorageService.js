@@ -140,8 +140,8 @@ class LocalStorageService {
       const items = await this.getAllItems(collection);
       return items.filter(item => {
         return Object.keys(criteria).every(key => {
-          if (criteria[key] === '') return true; // Skip empty criteria
-          if (key === 'price') return item[key] <= criteria[key]; // Special handling for price
+          if (criteria[key] === '') return true;
+          if (key === 'price') return item[key] <= criteria[key];
           return item[key] === criteria[key];
         });
       });
@@ -152,13 +152,13 @@ class LocalStorageService {
   }
 
   async initializeData() {
-    const dataInitialized = await AsyncStorage.getItem('dataInitialized');
+    const dataIsInitialized = await AsyncStorage.getItem('dataIsInitialized');
 
-    if (dataInitialized) {
+    if (dataIsInitialized) {
       return;
     }
 
-    // Clear existing data from AsyncStorage
+
     await this.deleteAllItems('houses');
     await this.deleteAllItems('users');
 
@@ -217,7 +217,7 @@ class LocalStorageService {
         state: 'RJ',
         city: 'Petrópolis',
         neighborhood: 'Amazonas',
-        nearbyCollege: 'Universidade Federal Fluminense (UFF)',
+        nearbyCollege: 'UFF Petrópolis',
         description: 'Excelente apartamento, localizado na Rua Bahia, no bairro amazonas, próximo do palácio Quitandinha, a BR-040, a Polícia Federal, a 20 minutos do Centro de Petrópolis e a 12 minutos do SMH. Apartamento bem arejado e ensolarado, composto por sala, 02 quartos, wc social, cozinha e área de serviço. Não tem condomínio, não tem garagem. Imóvel Compartilhado',
         images: houseImages.house1,
         announcer: users[0]
@@ -229,7 +229,7 @@ class LocalStorageService {
         state: 'RJ',
         city: 'Petrópolis',
         neighborhood: 'Quitandinha',
-        nearbyCollege: 'Universidade Federal Fluminense (UFF)',
+        nearbyCollege: 'UFF Petrópolis',
         description: 'Apartamento em ótimo local residencial, com fácil acesso para o Rio de Janeiro, ensolarado, constando de sala em dois ambientes, 2 quartos sendo 1 suíte, cozinha com armários e pequena área de serviço. Condomínio com salão de festas e uma vaga de garagem.',
         images: houseImages.house2,
         announcer: users[1]
@@ -241,7 +241,7 @@ class LocalStorageService {
         state: 'RJ',
         city: 'Niterói',
         neighborhood: 'Centro',
-        nearbyCollege: 'Universidade Federal Fluminense (UFF)',
+        nearbyCollege: 'UFF Petrópolis',
         description: 'Apartamento aconchegante para alugar com 2 quartos e 1 banheiro no total. O condomínio fica localizado em Rua Pastor Manoel Avelino de Souza no bairro Centro em Niterói. Está bem localizado, próximo a pontos de interesse de Centro, tais como UFF - Faculdade de Medicina, Unidade Municipal de Educação Infantil Alberto de Oliveira, Creche Comunitária Rosalda Paim, Escola de Enfermagem Aurora de Afonso Costa (UFF), Escola Municipal Alberto Francisco Torres e Niterói Shopping.',
         images: houseImages.house3,
         announcer: users[2]
@@ -253,7 +253,7 @@ class LocalStorageService {
         state: 'RJ',
         city: 'Rio de Janeiro',
         neighborhood: 'Catete',
-        nearbyCollege: 'Universidade Federal do Rio de Janeiro (UFRJ)',
+        nearbyCollege: 'UFRJ Rio de Janeiro',
         description: 'Imóvel aconchegante para alugar com 1 quarto e 1 banheiro no total. O condomínio fica localizado em Rua Bento Lisboa no bairro Catete em Rio de Janeiro. Está bem localizado, próximo a pontos de interesse de Catete, tais como Centro Universitário IBMR, Colégio Pinheiro Guimarães, UFRJ - Faculdade de Direito, Bonfim, Estação Catete e Colégio Amaro Cavalcanti. Apto tipo kitnet, prático de manter. Reformado, hidráulica e elétrica. Box blindex. Banheiro cabe máq. de lavar, cozinha cabe fogão, arejado, sol da manhã, portaria 24h. Bicicletário. 5 minutos a pé das estações do metrô Catete e Largo do Machado. No entorno farto comércio, restaurantes, farmácias, bares, mercados, bancos, lojas diversas, salões de beleza, hortifruti, Palácio do Catete, aterro do Flamengo. Permitido: Animal pequeno porte.',
         images: houseImages.house4,
         announcer: users[3]
@@ -265,14 +265,14 @@ class LocalStorageService {
         state: 'RJ',
         city: 'Petrópolis',
         neighborhood: 'Quitandinha',
-        nearbyCollege: 'Universidade Federal Fluminense (UFF)',
+        nearbyCollege: 'UFF Petrópolis',
         description: 'Composto de quarto com cama e armário, banheiro social e cozinha montada. área externa com parque verde.',
         images: houseImages.house5,
         announcer: users[4]
       }
     ];
 
-    // Function to convert image to base64
+
     const convertToBase64 = async (uri) => {
       try {
         const fileInfo = await FileSystem.getInfoAsync(uri);
@@ -288,7 +288,7 @@ class LocalStorageService {
       }
     };
 
-    // Convert images and update houses
+
     for (let house of houses) {
       try {
         const base64Images = await Promise.all(house.images.map(async (img) => {
@@ -296,7 +296,7 @@ class LocalStorageService {
           await asset.downloadAsync();
           return convertToBase64(asset.localUri || asset.uri);
         }));
-        house.images = base64Images.filter(Boolean); // Filter out any null results
+        house.images = base64Images.filter(Boolean);
         await this.saveItem('houses', house);
         console.log(`House saved: ${house.id}`);
       } catch (error) {
@@ -313,7 +313,7 @@ class LocalStorageService {
       }
     }
 
-    await AsyncStorage.setItem('dataInitialized', 'true');
+    await AsyncStorage.setItem('dataIsInitialized', 'true');
     console.log('Data initialization complete');
   }
 

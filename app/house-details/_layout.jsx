@@ -10,7 +10,7 @@ import localStorageService from '../service/localStorageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PagerView from 'react-native-pager-view';
 
-// Create a custom theme
+
 const theme = {
   ...DefaultTheme,
   roundness: 2,

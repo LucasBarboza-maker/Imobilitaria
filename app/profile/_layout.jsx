@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import localStorageService from '../service/localStorageService';
 
-// Create a custom theme
+
 const theme = {
   ...DefaultTheme,
   roundness: 2,
@@ -54,7 +54,7 @@ function Settings() {
   };
 
   const handleCelularChange = (text) => {
-    // Basic mask for celular input
+
     const cleaned = ('' + text).replace(/\D/g, '');
     const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
     if (match) {
@@ -71,7 +71,7 @@ function Settings() {
     const isCelularValid = validateCelular(celular);
 
     setCelularValid(isCelularValid);
-
+  
     if (isCelularValid) {
       const users = await localStorageService.getAllItems('users');
       const user = users.find(user => user.email === username);
@@ -125,7 +125,7 @@ function Settings() {
                 style={[styles.input, !celularValid && styles.errorInput]}
                 mode="flat"
                 keyboardType="phone-pad"
-                error={!celularValid}
+                error={!celularValid} 
               />
               {!celularValid && (
                 <Text style={styles.errorText}>Celular inválido</Text>

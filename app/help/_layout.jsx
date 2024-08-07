@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// Create a custom theme
+
 const theme = {
   ...DefaultTheme,
   roundness: 2,

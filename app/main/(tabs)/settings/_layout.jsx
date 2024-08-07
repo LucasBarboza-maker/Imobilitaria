@@ -4,7 +4,7 @@ import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider, Icon } from 'react-native-paper';
 
-// Create a custom theme
+
 const theme = {
   ...DefaultTheme,
   roundness: 2,

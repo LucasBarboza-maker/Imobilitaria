@@ -149,23 +149,56 @@ const CITIES_RJ = [
 ];
 
 const COLLEGES_RJ = [
-  'Universidade Federal do Rio de Janeiro (UFRJ)',
-  'Universidade do Estado do Rio de Janeiro (UERJ)',
-  'Universidade Federal Fluminense (UFF)',
-  'Universidade Federal Rural do Rio de Janeiro (UFRRJ)',
-  'Centro Federal de Educação Tecnológica Celso Suckow da Fonseca (CEFET/RJ)',
-  'Instituto Federal de Educação, Ciência e Tecnologia do Rio de Janeiro (IFRJ)',
-  'Instituto Federal de Educação, Ciência e Tecnologia Fluminense (IFF)',
-  'Universidade do Grande Rio (Unigranrio)',
-  'Universidade Estadual do Norte Fluminense Darcy Ribeiro (UENF)',
-  'Escola Nacional de Ciências Estatísticas (ENCE)',
-  'Escola Superior de Desenho Industrial (ESDI)',
-  'Fundação Centro Universitário Estadual da Zona Oeste (UEZO)',
-  'Instituto Militar de Engenharia (IME)',
-  'Universidade Federal do Estado do Rio de Janeiro (UNIRIO)',
-  'Universidade Federal de Alfenas (UNIFAL)',
-  'Fundação Getulio Vargas (FGV)'
+  'UFF Niterói',
+  'UFF Petrópolis',
+  'UFF Campos dos Goytacazes',
+  'UFF Volta Redonda',
+  'UFF Rio das Ostras',
+  'UFF Angra dos Reis',
+  'UFF Santo Antônio de Pádua',
+  'UFF Nova Friburgo',
+  'UFF Macaé',
+  'UFF Miracema',
+  'UFRJ Rio de Janeiro',
+  'UFRJ Macaé',
+  'UFRJ Duque de Caxias',
+  'UFRJ Xerém',
+  'UFRRJ Seropédica',
+  'UFRRJ Nova Iguaçu',
+  'UFRRJ Três Rios',
+  'UNIRIO Rio de Janeiro',
+  'IFRJ Rio de Janeiro (Realengo)',
+  'IFRJ Rio de Janeiro (Maracanã)',
+  'IFRJ Rio de Janeiro (Duque de Caxias)',
+  'IFRJ Nilópolis',
+  'IFRJ Engenheiro Paulo de Frontin',
+  'IFRJ Paracambi',
+  'IFRJ Volta Redonda',
+  'IFRJ Pinheiral',
+  'IFRJ Resende',
+  'IFRJ São Gonçalo',
+  'IFRJ Arraial do Cabo',
+  'IFRJ Niterói',
+  'UERJ Rio de Janeiro (Maracanã)',
+  'UERJ São Gonçalo',
+  'UERJ Duque de Caxias',
+  'UERJ Resende',
+  'UERJ Teresópolis',
+  'UERJ Petrópolis',
+  'CEFET Rio de Janeiro (Maracanã)',
+  'CEFET Nova Iguaçu',
+  'CEFET Petrópolis',
+  'CEFET Angra dos Reis',
+  'CEFET Itaguaí',
+  'CEFET Maria da Graça (Rio de Janeiro)',
+  'CEFET Valença'
 ];
+
+const cityColleges = {};
+
+CITIES_RJ.forEach(city => {
+  cityColleges[city] = COLLEGES_RJ.filter(college => college.includes(city));
+});
 
 function CreateHouseScreen() {
   const navigation = useNavigation();
@@ -442,9 +475,14 @@ function CreateHouseScreen() {
                         </TouchableOpacity>
                       }
                     >
-                      {COLLEGES_RJ.map((college, index) => (
-                        <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
-                      ))}
+                      {cityColleges[city] && cityColleges[city].length > 0
+                        ? cityColleges[city].map((college, index) => (
+                            <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
+                          ))
+                        : COLLEGES_RJ.map((college, index) => (
+                            <Menu.Item key={index} onPress={() => { setNearbyCollege(college); setCollegeMenuVisible(false); }} title={college} />
+                          ))
+                      }
                     </Menu>
                   </View>
                   {errors.nearbyCollege && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}

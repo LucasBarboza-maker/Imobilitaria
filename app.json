@@ -7,6 +7,9 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "packagerOpts": {
+      "silent": true
+    },
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -37,6 +40,9 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "bc178740-78e9-42ad-9c95-daba58611a56"
       }
     }
   }
