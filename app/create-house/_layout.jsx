@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import PagerView from 'react-native-pager-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import localStorageService from '../service/localStorageService';
-import { v4 as uuidv4 } from 'uuid'; // Import UUID
+
 
 const theme = {
   ...DefaultTheme,

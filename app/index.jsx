@@ -50,13 +50,14 @@ function LoginScreen() {
       if (user) {
         if (true) {
 
-          // await localStorageService.deleteAllItems('logged');
-          await AsyncStorage.setItem('logged', JSON.stringify({ email: username, password }));
-          // await localStorageService.saveItem('logged', user);
+          await localStorageService.deleteAllItems('logged').then(localStorageService.saveItem('logged', user).then(navigation.navigate('main/(tabs)')))
+          // await AsyncStorage.setItem('logged', JSON.stringify({ email: username, password }))
+           
+          // console.log(localStorageService.getAllItems('logged'))
         } else {
           await AsyncStorage.removeItem('logged');
         }
-        navigation.navigate('main/(tabs)');
+        
       } else {
         Alert.alert('Erro', 'Email ou senha incorretos');
       }
