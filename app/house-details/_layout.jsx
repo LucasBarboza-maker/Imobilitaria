@@ -45,11 +45,11 @@ function DetailScreen() {
 
     if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
       Linking.openURL(url).catch(err => {
-        console.error("Failed to open URL:", err);
-        Alert.alert("Error", "Could not open the URL. Please check if the URL is correct.");
+        console.error("Erro ao acessar endereço:", err);
+        Alert.alert("Erro", "Não foi possível acessar o endereço. Favor, conferir se o endereço está correto.");
       });
     } else {
-      Alert.alert("Invalid URL", "The provided URL is not valid. Please ensure it starts with http:// or https://");
+      Alert.alert("Endereço Inválido", "O endereço fornecido não é válido.");
     }
   };
 
