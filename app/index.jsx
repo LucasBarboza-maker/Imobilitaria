@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { LogBox } from 'react-native';
 import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { TextInput, Button, Checkbox } from 'react-native-paper';
@@ -7,6 +8,7 @@ import localStorageService from './service/localStorageService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 console.disableYellowBox = true;
+LogBox.ignoreAllLogs();
 
 function LoginScreen() {
   const navigation = useNavigation();

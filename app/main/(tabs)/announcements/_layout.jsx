@@ -3,6 +3,7 @@ import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, Platform, 
 import { useNavigation } from 'expo-router';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Button, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AnnouncementCard from '../../../../components/AnnouncementCard';
 import localStorageService from '../../../service/localStorageService';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,13 +22,13 @@ function UserAnnouncementsScreen() {
   const [announcements, setAnnouncements] = React.useState([]);
 
   const fetchUserAnnouncements = async () => {
-    const loggedUser = await localStorageService.getAllItems('logged');
+    const loggedUser = JSON.parse(await AsyncStorage.getItem('logged'));
     if (loggedUser.length === 0) {
       return;
     }
 
     const houses = await localStorageService.getAllItems('houses');
-    const userAnnouncements = houses.filter(house => house.announcer.id === loggedUser[0].id);
+    const userAnnouncements = houses.filter(house => house.announcer.id === loggedUser.id);
     setAnnouncements(userAnnouncements);
   };
 
