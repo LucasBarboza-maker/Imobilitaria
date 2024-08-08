@@ -116,6 +116,7 @@ function DetailScreen() {
     const houses = await localStorageService.getAllItems('houses');
     const houseToUpdate = houses.find(house => house.id === houseId);
 
+
     if (storedUser) {
       if (houseToUpdate.favoriteUsers) {
         if (isFavorite) {
@@ -302,6 +303,7 @@ function DetailScreen() {
               <Button onPress={() => setFavoriteModalVisible(false)} mode="contained" style={styles.modalButton}>Não</Button>
               <Button onPress={toggleFavorite} mode="contained" style={styles.modalButton}>Sim</Button>
             </View>
+          
           </Modal>
           <Modal visible={deleteModalVisible} onDismiss={() => setDeleteModalVisible(false)} contentContainerStyle={styles.modal}>
             <Text>Tem certeza que deseja excluir este comentário?</Text>

@@ -219,6 +219,7 @@ class LocalStorageService {
         neighborhood: 'Amazonas',
         nearbyCollege: 'UFF Petrópolis',
         description: 'Excelente apartamento, localizado na Rua Bahia, no bairro amazonas, próximo do palácio Quitandinha, a BR-040, a Polícia Federal, a 20 minutos do Centro de Petrópolis e a 12 minutos do SMH. Apartamento bem arejado e ensolarado, composto por sala, 02 quartos, wc social, cozinha e área de serviço. Não tem condomínio, não tem garagem. Imóvel Compartilhado',
+        url: "https://www.google.com/maps?ll=-22.523644,-43.210329&z=16&t=m&hl=en-US&gl=US&mapclient=embed&q=22%C2%B031%2725.1%22S+43%C2%B012%2737.2%22W+-22.523644,+-43.210329@-22.523644,-43.210329",
         images: houseImages.house1,
         announcer: users[0]
       },
@@ -231,6 +232,7 @@ class LocalStorageService {
         neighborhood: 'Quitandinha',
         nearbyCollege: 'UFF Petrópolis',
         description: 'Apartamento em ótimo local residencial, com fácil acesso para o Rio de Janeiro, ensolarado, constando de sala em dois ambientes, 2 quartos sendo 1 suíte, cozinha com armários e pequena área de serviço. Condomínio com salão de festas e uma vaga de garagem.',
+        url: 'https://www.google.com/maps?ll=-22.523644,-43.210329&z=16&t=m&hl=en-US&gl=US&mapclient=embed&q=22%C2%B031%2725.1%22S+43%C2%B012%2737.2%22W+-22.523644,+-43.210329@-22.523644,-43.210329',
         images: houseImages.house2,
         announcer: users[1]
       },
@@ -243,6 +245,7 @@ class LocalStorageService {
         neighborhood: 'Centro',
         nearbyCollege: 'UFF Petrópolis',
         description: 'Apartamento aconchegante para alugar com 2 quartos e 1 banheiro no total. O condomínio fica localizado em Rua Pastor Manoel Avelino de Souza no bairro Centro em Niterói. Está bem localizado, próximo a pontos de interesse de Centro, tais como UFF - Faculdade de Medicina, Unidade Municipal de Educação Infantil Alberto de Oliveira, Creche Comunitária Rosalda Paim, Escola de Enfermagem Aurora de Afonso Costa (UFF), Escola Municipal Alberto Francisco Torres e Niterói Shopping.',
+        url: 'https://www.google.com/maps/@-22.8933896,-43.1126078,3a,75y,90t/data=!3m7!1e1!3m5!1swZ9ilFbsHWBBIdisxkKXUA!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DwZ9ilFbsHWBBIdisxkKXUA%26cb_client%3Dmaps_sv.share%26w%3D900%26h%3D600%26yaw%3D0%26pitch%3D0%26thumbfov%3D90!7i16384!8i8192?coh=205410&entry=ttu',
         images: houseImages.house3,
         announcer: users[2]
       },
@@ -255,6 +258,7 @@ class LocalStorageService {
         neighborhood: 'Catete',
         nearbyCollege: 'UFRJ Rio de Janeiro',
         description: 'Imóvel aconchegante para alugar com 1 quarto e 1 banheiro no total. O condomínio fica localizado em Rua Bento Lisboa no bairro Catete em Rio de Janeiro. Está bem localizado, próximo a pontos de interesse de Catete, tais como Centro Universitário IBMR, Colégio Pinheiro Guimarães, UFRJ - Faculdade de Direito, Bonfim, Estação Catete e Colégio Amaro Cavalcanti. Apto tipo kitnet, prático de manter. Reformado, hidráulica e elétrica. Box blindex. Banheiro cabe máq. de lavar, cozinha cabe fogão, arejado, sol da manhã, portaria 24h. Bicicletário. 5 minutos a pé das estações do metrô Catete e Largo do Machado. No entorno farto comércio, restaurantes, farmácias, bares, mercados, bancos, lojas diversas, salões de beleza, hortifruti, Palácio do Catete, aterro do Flamengo. Permitido: Animal pequeno porte.',
+        url: 'https://www.google.com/maps/@-22.9275098,-43.1793502,3a,75y,213.33h,90t/data=!3m10!1e1!3m8!1sqaCagzaHK5NyRXBU3wVqnA!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3DqaCagzaHK5NyRXBU3wVqnA%26cb_client%3Dmaps_sv.share%26w%3D900%26h%3D600%26yaw%3D213.32826119254435%26pitch%3D0%26thumbfov%3D90!7i16384!8i8192!9m2!1b1!2i49?coh=205410&entry=ttu',
         images: houseImages.house4,
         announcer: users[3]
       },
@@ -267,6 +271,7 @@ class LocalStorageService {
         neighborhood: 'Quitandinha',
         nearbyCollege: 'UFF Petrópolis',
         description: 'Composto de quarto com cama e armário, banheiro social e cozinha montada. área externa com parque verde.',
+        url: 'https://www.google.com/maps?ll=-22.526,-43.211&z=16&t=m&hl=en-US&gl=US&mapclient=embed&q=22%C2%B031%2733.6%22S+43%C2%B012%2739.6%22W+-22.526000,+-43.211000@-22.526,-43.211',
         images: houseImages.house5,
         announcer: users[4]
       }

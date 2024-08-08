@@ -50,7 +50,7 @@ function LoginScreen() {
       if (user) {
         if (true) {
 
-          await localStorageService.deleteAllItems('logged').then(localStorageService.saveItem('logged', user).then(navigation.navigate('main/(tabs)')))
+          await localStorageService.deleteAllItems('logged').then(await AsyncStorage.setItem('logged', JSON.stringify({ email: username, password }))).then(navigation.navigate('main/(tabs)'))
           // await AsyncStorage.setItem('logged', JSON.stringify({ email: username, password }))
            
           // console.log(localStorageService.getAllItems('logged'))

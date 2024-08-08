@@ -323,7 +323,7 @@ function CreateHouseScreen() {
     }
 
     try {
-      const loggedUser = await localStorageService.getAllItems('logged');
+      const loggedUser = await AsyncStorage.getItem('logged')
       if (loggedUser.length === 0) {
         Alert.alert('Erro', 'Nenhum usuário está logado');
         return;
