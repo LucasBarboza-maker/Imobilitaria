@@ -210,6 +210,7 @@ function CreateHouseScreen() {
   const [neighborhood, setNeighborhood] = React.useState('');
   const [nearbyCollege, setNearbyCollege] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [url, setUrl] = React.useState('');
   const [images, setImages] = React.useState([]);
   const [propertyTypeMenuVisible, setPropertyTypeMenuVisible] = React.useState(false);
   const [stateMenuVisible, setStateMenuVisible] = React.useState(false);
@@ -225,6 +226,7 @@ function CreateHouseScreen() {
     neighborhood: false,
     nearbyCollege: false,
     description: false,
+    url: false
   });
 
   React.useEffect(() => {
@@ -240,6 +242,7 @@ function CreateHouseScreen() {
       setNeighborhood(house[0].neighborhood);
       setNearbyCollege(house[0].nearbyCollege);
       setDescription(house[0].description);
+      setUrl(house[0].url)
       setImages(house[0].images);
     };
 
@@ -311,6 +314,7 @@ function CreateHouseScreen() {
       neighborhood: !neighborhood,
       nearbyCollege: !nearbyCollege,
       description: !description,
+      url: !url
     };
 
     if (Object.values(newErrors).some(error => error)) {
@@ -334,6 +338,7 @@ function CreateHouseScreen() {
         neighborhood,
         nearbyCollege,
         description,
+        url,
         images,
         announcer: loggedUser[0],
       };
@@ -413,6 +418,14 @@ function CreateHouseScreen() {
                 mode="flat"
               />
               {errors.price && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
+
+              <TextInput
+                label="Link da Localização:"
+                value={url}
+                onChangeText={text => setUrl(text)}
+                style={[styles.input, errors.url && styles.errorInput]}
+              />
+              {errors.url && <Text style={styles.errorText}>Este campo é obrigatório.</Text>}
 
               <View style={{ borderWidth: 1, borderColor: errors.state ? 'red' : 'transparent', borderRadius: 5, marginBottom: 16, backgroundColor: 'white' }}>
                 <Menu

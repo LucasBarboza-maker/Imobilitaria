@@ -23,7 +23,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jmsupernet.imobilitariaapp"
+      "package": "com.jmsupernet.imobilitariaapp",
+      "minSdkVersion": 24
     },
     "web": {
       "bundler": "metro",
@@ -32,7 +33,15 @@
     },
     "plugins": [
       "expo-router",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 24
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

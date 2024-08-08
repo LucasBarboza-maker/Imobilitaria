@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput, Alert, Dimensions, Share } from 'react-native';
+import { SafeAreaView, Linking, StyleSheet, Text, View, Platform, StatusBar, TouchableOpacity, ImageBackground, ScrollView, TextInput, Alert, Dimensions, Share } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { DefaultTheme, Provider as PaperProvider, Button, Modal, Portal } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -36,6 +36,22 @@ function DetailScreen() {
   const [textoParaRemoverOuAdicionar, setTextoParaRemoverOuAdicionar] = React.useState('adicionar');
   const [deleteModalVisible, setDeleteModalVisible] = React.useState(false);
   const [commentToDelete, setCommentToDelete] = React.useState(null);
+
+  const handlePress = () => {
+    let url = house.url;
+    if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'http://' + url; // Prepend http:// if the protocol is missing
+    }
+
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      Linking.openURL(url).catch(err => {
+        console.error("Failed to open URL:", err);
+        Alert.alert("Error", "Could not open the URL. Please check if the URL is correct.");
+      });
+    } else {
+      Alert.alert("Invalid URL", "The provided URL is not valid. Please ensure it starts with http:// or https://");
+    }
+  };
 
   React.useEffect(() => {
     const fetchHouseDetails = async () => {
@@ -214,6 +230,15 @@ function DetailScreen() {
             <Text style={{ fontSize: 18, marginTop: 5 }}>{house.description}</Text>
           </View>
           <View style={styles.divider} />
+          <View style={styles.container}>
+          <View style={styles.descriptionContainer}>
+            <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Link da Localização:</Text>
+              <TouchableOpacity onPress={handlePress}>
+                <Text style={styles.link}>{house.url}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.divider} />
           <View style={styles.descriptionContainer}>
             <Text style={{ fontSize: 25, fontWeight: 'bold' }}>Faculdade Próxima:</Text>
             <Text style={{ fontSize: 18, marginTop: 5 }}>{house.nearbyCollege}</Text>
@@ -356,6 +381,12 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     fontSize: 16,
     padding: 16,
+  },
+  link: {
+    fontSize: 18,
+    marginTop: 5,
+    color: 'blue',
+    textDecorationLine: 'underline',
   },
   divider: {
     height: 1,
